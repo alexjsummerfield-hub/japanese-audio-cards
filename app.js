@@ -24,11 +24,11 @@ function speak(text,lang,done=()=>{},t=token){
  const vs=synth.getVoices();
  const chosen=lang==='ja-JP'?japaneseVoices().find(v=>voiceKey(v)===state.settings.voice):vs.find(v=>/^en/i.test(v.lang));
  if(chosen)utterance.voice=chosen;utterance.rate=lang==='ja-JP'?Number(state.settings.rate):1;
- utterance.onend=()=>{if(t===token)done()};utterance.onerror=()=>{if(t===token)audioFailure('Audio could not play. Tap Hear again to retry, or choose another voice in settings.')};
+ utterance.onend=()=>{if(t===token)done()};utterance.onerror=()=>{if(t===token)audioFailure('Audio could not play. Tap Play to retry, or choose another voice in settings.')};
  synth.speak(utterance);
 }
 function audioFailure(message){$('notice').textContent=message;$('settingsStatus').textContent=message;$('stage').textContent='Audio unavailable · you can retry';$('response').disabled=false;$('check').disabled=false}
-function focusAnswer(){if(active&&!checked&&!$('settingsDialog').open)$('response').focus({preventScroll:true})}
+function focusAnswer(){if(active&&!checked&&!$('settingsDialog').open){$('response').focus({preventScroll:true});viewport()}}
 function playPrompt(){
  if(!active)return;stop();$('notice').textContent='';const t=token,c=session[index];
  $('stage').textContent=mode==='repeat'?'Listen to the Japanese model…':'Listen to the English prompt…';
@@ -50,6 +50,7 @@ function start(){
  $('setup').hidden=true;$('complete').hidden=true;$('practice').hidden=false;document.body.classList.add('practising');save();showCard();focusAnswer();playPrompt();
 }
 function showCard(){
+ document.querySelector('.practice-scroll').scrollTop=0;
  const c=session[index];attempt=null;assisted=mode==='repeat';checked=false;
  if(!results[c.id])results[c.id]={checks:0,missed:false,status:'pending',accepted:false};
  $('progress').textContent=`${index+1} / ${session.length}${c._retry?' · Review':''}`;$('bar').max=session.length;$('bar').value=index;
@@ -96,7 +97,20 @@ function finish(){
  $('complete').focus();updateSummary();
 }
 function back(){stop();active=false;$('response').blur();document.body.classList.remove('practising');$('practice').hidden=true;$('complete').hidden=true;$('setup').hidden=false;updateSummary()}
-function viewport(){const v=window.visualViewport;document.documentElement.style.setProperty('--practice-height',(v?v.height:innerHeight)+'px');document.documentElement.style.setProperty('--practice-top',(v?v.offsetTop:0)+'px')}
+function keepAnswerVisible(){
+ if(!active||checked||document.activeElement!==$('response'))return;
+ const scroller=document.querySelector('.practice-scroll'),field=$('response').getBoundingClientRect(),area=scroller.getBoundingClientRect();
+ // Scroll only the practice pane; do not move Safari's page or reopen dictation.
+ if(field.bottom>area.bottom-8)scroller.scrollTop+=field.bottom-area.bottom+8;
+ else if(field.top<area.top+8)scroller.scrollTop-=area.top+8-field.top;
+}
+function viewport(){
+ const v=window.visualViewport,height=v?v.height:innerHeight;
+ document.documentElement.style.setProperty('--practice-height',height+'px');
+ document.documentElement.style.setProperty('--practice-top',(v?v.offsetTop:0)+'px');
+ document.body.classList.toggle('compact-practice',active&&height<560);
+ if(window.requestAnimationFrame)window.requestAnimationFrame(keepAnswerVisible);
+}
 function renderPreparation(){
  $('phraseList').replaceChildren();CARDS.forEach(c=>{const row=document.createElement('div');row.className='phrase';const meaning=document.createElement('p');meaning.textContent=c.prompt;const reading=document.createElement('p');reading.className='reading';reading.textContent=c.romaji;reading.hidden=!state.settings.romaji;const button=document.createElement('button');button.textContent='▶';button.setAttribute('aria-label','Hear Japanese: '+c.prompt);button.onclick=()=>{stop();$('settingsStatus').textContent='';speak(c.target,'ja-JP',()=>{})};row.append(meaning,reading,button);$('phraseList').append(row)})
 }
@@ -112,7 +126,8 @@ for(const [id,key] of [['voice','voice'],['rate','rate'],['delay','delay'],['sho
 }
 $('mode').onchange=()=>{$('modeHelp').textContent=$('mode').value==='repeat'?'Hear the Japanese, then repeat it using keyboard dictation.':'Hear the English, then say the Japanese from memory.'};
 $('clear').onclick=()=>{if(!confirm('Clear only Japanese practice history on this browser?'))return;state.records={};state.repetition={};save();$('settingsStatus').textContent='Japanese practice history cleared.'};
+$('response').addEventListener('focus',viewport);
 window.visualViewport?.addEventListener('resize',viewport);window.visualViewport?.addEventListener('scroll',viewport);window.addEventListener('resize',viewport);
 if(synth)synth.onvoiceschanged=refreshVoices;
-document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(active)$('stage').textContent='Paused · tap Hear again to resume'}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(active)$('stage').textContent='Paused · tap Play to resume'}});
 renderPreparation();refreshVoices();updateSummary();
