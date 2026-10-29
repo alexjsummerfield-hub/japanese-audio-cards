@@ -22,18 +22,22 @@ function speak(text,lang,done=()=>{},t=token){
  if(!synth){audioFailure('Speech playback is unavailable in this browser.');return}
  const utterance=new SpeechSynthesisUtterance(text);utterance.lang=lang;
  const vs=synth.getVoices();
- const chosen=lang==='ja-JP'?japaneseVoices().find(v=>voiceKey(v)===state.settings.voice):vs.find(v=>/^en/i.test(v.lang));
+ const chosen=lang==='ja-JP'?japaneseVoices().find(v=>voiceKey(v)===state.settings.voice):vs.find(v=>/^en-GB$/i.test(v.lang)&&v.default)||vs.find(v=>/^en-GB$/i.test(v.lang));
  if(chosen)utterance.voice=chosen;utterance.rate=lang==='ja-JP'?Number(state.settings.rate):1;
  utterance.onend=()=>{if(t===token)done()};utterance.onerror=()=>{if(t===token)audioFailure('Audio could not play. Tap Play to retry, or choose another voice in settings.')};
  synth.speak(utterance);
 }
 function audioFailure(message){$('notice').textContent=message;$('settingsStatus').textContent=message;$('stage').textContent='Audio unavailable · you can retry';$('response').disabled=false;$('check').disabled=false}
 function focusAnswer(){if(active&&!checked&&!$('settingsDialog').open){$('response').focus({preventScroll:true});viewport()}}
-function playPrompt(){
+function playPrompt(includeJapanese=false){
  if(!active)return;stop();$('notice').textContent='';const t=token,c=session[index];
- $('stage').textContent=mode==='repeat'?'Listen to the Japanese model…':'Listen to the English prompt…';
- if(mode==='repeat')assisted=true;
- speak(mode==='repeat'?c.target:c.prompt,mode==='repeat'?'ja-JP':'en-GB',()=>{$('stage').textContent='Your turn · use Japanese keyboard dictation';focusAnswer()},t);
+ $('stage').textContent='Listen to the English prompt…';
+ const ready=()=>{$('stage').textContent='Your turn · use Japanese keyboard dictation';focusAnswer()};
+ speak(c.prompt,'en-GB',()=>{
+  if(!includeJapanese){ready();return}
+  assisted=true;$('stage').textContent='Listen to the Japanese model…';
+  speak(c.target,'ja-JP',ready,t);
+ },t);
 }
 function showModel(){const c=session[index];$('model').hidden=false;$('romaji').textContent=c.romaji;$('romaji').hidden=!state.settings.romaji;$('script').textContent=c.target;$('script').hidden=!state.settings.script}
 function playModel(){
@@ -47,7 +51,7 @@ function orderCards(){
 }
 function start(){
  stop();mode=$('mode').value;sessionId=++state.sessionNumber;session=orderCards();index=0;results={};retryIds=new Set();active=true;
- $('setup').hidden=true;$('complete').hidden=true;$('practice').hidden=false;document.body.classList.add('practising');save();showCard();focusAnswer();playPrompt();
+ $('setup').hidden=true;$('complete').hidden=true;$('practice').hidden=false;document.body.classList.add('practising');save();showCard();focusAnswer();playPrompt(mode==='repeat');
 }
 function showCard(){
  document.querySelector('.practice-scroll').scrollTop=0;
@@ -67,9 +71,13 @@ function checkAnswer(event){
  r.checks++;r.missed=r.missed||!match;
  if(match)r.status=r.status==='first'?'first':r.missed||r.checks>1?'repeated':'first';
  if(mode==='recall')state.records[c.id]=Learning.rate(attempt.previous,match?(assisted?'assisted':'correct'):'miss',Date.now(),sessionId);
- else {const p=state.repetition[c.id]||{attempts:0,matches:0};state.repetition[c.id]={attempts:p.attempts+1,matches:p.matches+Number(match)}}
- checked=true;$('response').blur();$('response').disabled=true;$('check').disabled=true;$('reveal').hidden=true;
- $('feedback').textContent=match?'Matches an accepted answer.':'Not a match. Compare below.';$('feedback').dataset.result=match?'match':'miss';$('feedback').hidden=false;$('answerActions').hidden=match;
+ else {
+  const p=state.repetition[c.id]||{attempts:0,matches:0};state.repetition[c.id]={attempts:p.attempts+1,matches:p.matches+Number(match)};
+  // A missed repetition stays due; a later assisted match cannot erase it.
+  if(!match||attempt.previous?.needsReview)state.records[c.id]=Learning.rate(attempt.previous,match?'assisted':'miss',Date.now(),sessionId);
+ }
+ checked=true;$('response').blur();$('response').disabled=true;$('check').disabled=true;$('reveal').hidden=false;
+ $('feedback').textContent=match?'Matches an accepted answer.':'Not a match. Compare below.';$('feedback').dataset.result=match?'match':'miss';$('feedback').hidden=false;$('answerActions').hidden=false;$('accept').hidden=match;
  save();playModel();$('model').scrollIntoView({block:'nearest'});
 }
 function acceptAnswer(){
@@ -77,13 +85,26 @@ function acceptAnswer(){
  const c=session[index],before=attempt.resultBefore;
  results[c.id]={...before,checks:before.checks+1,status:before.status==='first'?'first':before.missed||before.checks?'repeated':'first',accepted:true};
  if(mode==='recall')state.records[c.id]=Learning.rate(attempt.previous,attempt.assistedBefore?'assisted':'correct',Date.now(),sessionId);
- else state.repetition[c.id].matches++;
- attempt.match=true;$('feedback').textContent='Accepted by you.';$('feedback').dataset.result='match';$('answerActions').hidden=true;save();
+ else {
+  state.repetition[c.id].matches++;
+  // Restore the pre-attempt review record when a mismatch was false.
+  if(attempt.previous)state.records[c.id]=attempt.previous;
+  else delete state.records[c.id];
+ }
+ attempt.match=true;$('feedback').textContent='Accepted by you.';$('feedback').dataset.result='match';$('accept').hidden=true;save();
+}
+function tryAgain(){
+ if(!active||!checked)return;
+ stop();checked=false;assisted=true;attempt=null;
+ $('response').value='';$('response').disabled=false;$('check').disabled=false;
+ $('feedback').hidden=true;$('answerActions').hidden=true;$('model').hidden=true;$('reveal').hidden=false;
+ $('notice').textContent='';$('stage').textContent='Try the same phrase again';
+ focusAnswer();
 }
 function next(){
  if(!active)return;stop();
- if(checked&&attempt&&!attempt.match)Learning.queueRetry(session,index,retryIds,2);
- if(index+1>=session.length){finish();return}index++;showCard();focusAnswer();playPrompt();
+ if(results[session[index].id]?.missed)Learning.queueRetry(session,index,retryIds,2);
+ if(index+1>=session.length){finish();return}index++;showCard();focusAnswer();playPrompt(mode==='repeat');
 }
 function finish(){
  active=false;stop();$('response').blur();document.body.classList.remove('practising');$('practice').hidden=true;$('complete').hidden=false;
@@ -114,9 +135,9 @@ function viewport(){
 function renderPreparation(){
  $('phraseList').replaceChildren();CARDS.forEach(c=>{const row=document.createElement('div');row.className='phrase';const meaning=document.createElement('p');meaning.textContent=c.prompt;const reading=document.createElement('p');reading.className='reading';reading.textContent=c.romaji;reading.hidden=!state.settings.romaji;const button=document.createElement('button');button.textContent='▶';button.setAttribute('aria-label','Hear Japanese: '+c.prompt);button.onclick=()=>{stop();$('settingsStatus').textContent='';speak(c.target,'ja-JP',()=>{})};row.append(meaning,reading,button);$('phraseList').append(row)})
 }
-$('start').onclick=start;$('again').onclick=start;$('lesson').onclick=back;$('back').onclick=back;$('play').onclick=playPrompt;$('next').onclick=next;
+$('start').onclick=start;$('again').onclick=start;$('lesson').onclick=back;$('back').onclick=back;$('play').onclick=()=>playPrompt();$('next').onclick=next;
 $('answerForm').onsubmit=checkAnswer;$('response').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(!e.repeat)checkAnswer(e)}};
-$('accept').onclick=acceptAnswer;$('reviewSoon').onclick=()=>{if(!active)return;const c=session[index];if(mode==='recall')state.records[c.id]=Learning.rate(attempt?.previous,'miss',Date.now(),sessionId);$('answerActions').hidden=true;$('notice').textContent='Kept for another review.';save()};
+$('accept').onclick=acceptAnswer;$('tryAgain').onclick=tryAgain;
 $('replayModel').onclick=playModel;$('reveal').onclick=()=>{if(mode==='recall'&&!checked){state.records[session[index].id]=Learning.rate(state.records[session[index].id],'assisted',Date.now(),sessionId);save()}playModel();$('model').scrollIntoView({block:'nearest'})};
 $('settings').onclick=()=>{stop();$('response').blur();$('settingsStatus').textContent='';refreshVoices();$('settingsDialog').showModal()};$('practiceSettings').onclick=()=>$('settings').click();$('done').onclick=()=>{stop();$('settingsDialog').close()};
 $('refreshVoices').onclick=refreshVoices;$('previewVoice').onclick=()=>{stop();$('settingsStatus').textContent='Playing voice sample…';speak(CARDS[0].target,'ja-JP',()=>{$('settingsStatus').textContent='Sample finished.'})};
@@ -124,7 +145,7 @@ for(const [id,key] of [['voice','voice'],['rate','rate'],['delay','delay'],['sho
  const element=$(id);if(element.type==='checkbox')element.checked=state.settings[key];else if(id!=='voice')element.value=state.settings[key];
  element.onchange=()=>{state.settings[key]=element.type==='checkbox'?element.checked:element.value;save();renderPreparation();if(active&&!$('model').hidden)showModel();if(id==='rate'||id==='voice')$('previewVoice').click()};
 }
-$('mode').onchange=()=>{$('modeHelp').textContent=$('mode').value==='repeat'?'Hear the Japanese, then repeat it using keyboard dictation.':'Hear the English, then say the Japanese from memory.'};
+$('mode').onchange=()=>{$('modeHelp').textContent=$('mode').value==='repeat'?'Hear the English, then Japanese. Repeat the Japanese using keyboard dictation.':'Hear the English, then say the Japanese from memory.'};
 $('clear').onclick=()=>{if(!confirm('Clear only Japanese practice history on this browser?'))return;state.records={};state.repetition={};save();$('settingsStatus').textContent='Japanese practice history cleared.'};
 $('response').addEventListener('focus',viewport);
 window.visualViewport?.addEventListener('resize',viewport);window.visualViewport?.addEventListener('scroll',viewport);window.addEventListener('resize',viewport);
