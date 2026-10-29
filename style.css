@@ -26,3 +26,8 @@
 .compact-practice .context{font-size:12px;padding:6px 8px;margin-bottom:8px}
 .compact-practice .next-bar{padding-top:5px}
 .compact-practice .model{margin-top:10px;padding-top:10px}
+
+#feedback[data-result=match],#feedback[data-result=miss]{padding:10px 12px;border-radius:10px;border:1px solid;font-size:14px;line-height:1.35;font-weight:700}
+#feedback[data-result=match]{background:#e7f2e9;border-color:#a2c5ac}
+#feedback[data-result=miss]{background:#fff0e8;border-color:#d8ab92}
+#feedback[data-result=match]::first-letter,#feedback[data-result=miss]::first-letter{font-size:20px;line-height:1;font-weight:800}
