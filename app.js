@@ -3,6 +3,9 @@ const $=id=>document.getElementById(id), STORAGE='japanese-travel-pilot-v1';
 let state={records:{},repetition:{},sessionNumber:0,settings:{voice:'auto',rate:'1',delay:'1500',romaji:true,script:false}};
 let storageOK=true;
 try{const saved=JSON.parse(localStorage.getItem(STORAGE)||'null');if(saved)state={...state,...saved,settings:{...state.settings,...saved.settings}}}catch{storageOK=false}
+// Keep the existing Slower preference when upgrading from the earlier 80% setting.
+if(state.settings.rate==='0.8')state.settings.rate='0.75';
+if(!['1','0.75'].includes(state.settings.rate))state.settings.rate='1';
 const synth=window.speechSynthesis;
 let session=[],index=0,mode='repeat',sessionId=0,results={},retryIds=new Set(),attempt=null,assisted=false,checked=false,active=false,token=0,timer=null;
 function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));storageOK=true}catch{storageOK=false}updateSummary()}
@@ -22,7 +25,7 @@ function speak(text,lang,done=()=>{},t=token){
  if(!synth){audioFailure('Speech playback is unavailable in this browser.');return}
  const utterance=new SpeechSynthesisUtterance(text);utterance.lang=lang;
  const vs=synth.getVoices();
- const chosen=lang==='ja-JP'?japaneseVoices().find(v=>voiceKey(v)===state.settings.voice):vs.find(v=>/^en-GB$/i.test(v.lang)&&v.default)||vs.find(v=>/^en-GB$/i.test(v.lang));
+ const chosen=lang==='ja-JP'?japaneseVoices().find(v=>voiceKey(v)===state.settings.voice):vs.find(v=>/^en(?:-|$)/i.test(v.lang)&&v.default);
  if(chosen)utterance.voice=chosen;utterance.rate=lang==='ja-JP'?Number(state.settings.rate):1;
  utterance.onend=()=>{if(t===token)done()};utterance.onerror=()=>{if(t===token)audioFailure('Audio could not play. Tap Play to retry, or choose another voice in settings.')};
  synth.speak(utterance);
@@ -39,10 +42,14 @@ function playPrompt(includeJapanese=false){
  if(!active)return;stop();$('notice').textContent='';const t=token,c=session[index];
  $('stage').textContent='Listen to the English prompt…';
  const ready=()=>{$('stage').textContent='Your turn · use Japanese keyboard dictation';focusAnswer()};
- speak(c.prompt,'en-GB',()=>{
+ speak(c.prompt,'en',()=>{
   if(!includeJapanese){ready();return}
-  assisted=true;$('stage').textContent='Listen to the Japanese model…';
-  speak(c.target,'ja-JP',ready,t);
+  $('stage').textContent='Japanese follows…';
+  timer=setTimeout(()=>{
+   timer=null;if(t!==token)return;
+   assisted=true;$('stage').textContent='Listen to the Japanese model…';
+   speak(c.target,'ja-JP',ready,t);
+  },500);
  },t);
 }
 function showModel(){const c=session[index];$('model').hidden=false;$('romaji').textContent=c.romaji;$('romaji').hidden=!state.settings.romaji;$('script').textContent=c.target;$('script').hidden=!state.settings.script}
