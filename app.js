@@ -28,7 +28,13 @@ function speak(text,lang,done=()=>{},t=token){
  synth.speak(utterance);
 }
 function audioFailure(message){$('notice').textContent=message;$('settingsStatus').textContent=message;$('stage').textContent='Audio unavailable · you can retry';$('response').disabled=false;$('check').disabled=false}
-function focusAnswer(){if(active&&!checked&&!$('settingsDialog').open){$('response').focus({preventScroll:true});viewport()}}
+function focusAnswer(){
+ if(!active||checked||$('settingsDialog').open)return;
+ const field=$('response');
+ // Focus during the tap itself: iPhone cannot open its keyboard from speech's onend.
+ if(document.activeElement!==field)field.focus({preventScroll:true});
+ viewport();
+}
 function playPrompt(includeJapanese=false){
  if(!active)return;stop();$('notice').textContent='';const t=token,c=session[index];
  $('stage').textContent='Listen to the English prompt…';
@@ -77,7 +83,7 @@ function checkAnswer(event){
   if(!match||attempt.previous?.needsReview)state.records[c.id]=Learning.rate(attempt.previous,match?'assisted':'miss',Date.now(),sessionId);
  }
  checked=true;$('response').blur();$('response').disabled=true;$('check').disabled=true;$('reveal').hidden=false;
- $('feedback').textContent=match?'Matches an accepted answer.':'Not a match. Compare below.';$('feedback').dataset.result=match?'match':'miss';$('feedback').hidden=false;$('answerActions').hidden=false;$('accept').hidden=match;
+ $('feedback').textContent=match?'✓ Matches an accepted answer.':'✕ Not a match. Compare below.';$('feedback').dataset.result=match?'match':'miss';$('feedback').hidden=false;$('answerActions').hidden=false;$('accept').hidden=match;
  save();playModel();$('model').scrollIntoView({block:'nearest'});
 }
 function acceptAnswer(){
@@ -91,7 +97,7 @@ function acceptAnswer(){
   if(attempt.previous)state.records[c.id]=attempt.previous;
   else delete state.records[c.id];
  }
- attempt.match=true;$('feedback').textContent='Accepted by you.';$('feedback').dataset.result='match';$('accept').hidden=true;save();
+ attempt.match=true;$('feedback').textContent='✓ Accepted by you.';$('feedback').dataset.result='match';$('accept').hidden=true;save();
 }
 function tryAgain(){
  if(!active||!checked)return;
@@ -135,11 +141,11 @@ function viewport(){
 function renderPreparation(){
  $('phraseList').replaceChildren();CARDS.forEach(c=>{const row=document.createElement('div');row.className='phrase';const meaning=document.createElement('p');meaning.textContent=c.prompt;const reading=document.createElement('p');reading.className='reading';reading.textContent=c.romaji;reading.hidden=!state.settings.romaji;const button=document.createElement('button');button.textContent='▶';button.setAttribute('aria-label','Hear Japanese: '+c.prompt);button.onclick=()=>{stop();$('settingsStatus').textContent='';speak(c.target,'ja-JP',()=>{})};row.append(meaning,reading,button);$('phraseList').append(row)})
 }
-$('start').onclick=start;$('again').onclick=start;$('lesson').onclick=back;$('back').onclick=back;$('play').onclick=()=>playPrompt();$('next').onclick=next;
+$('start').onclick=start;$('again').onclick=start;$('lesson').onclick=back;$('back').onclick=back;$('play').onclick=()=>{focusAnswer();playPrompt()};$('next').onclick=next;
 $('answerForm').onsubmit=checkAnswer;$('response').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(!e.repeat)checkAnswer(e)}};
 $('accept').onclick=acceptAnswer;$('tryAgain').onclick=tryAgain;
-$('replayModel').onclick=playModel;$('reveal').onclick=()=>{if(mode==='recall'&&!checked){state.records[session[index].id]=Learning.rate(state.records[session[index].id],'assisted',Date.now(),sessionId);save()}playModel();$('model').scrollIntoView({block:'nearest'})};
-$('settings').onclick=()=>{stop();$('response').blur();$('settingsStatus').textContent='';refreshVoices();$('settingsDialog').showModal()};$('practiceSettings').onclick=()=>$('settings').click();$('done').onclick=()=>{stop();$('settingsDialog').close()};
+$('reveal').onclick=()=>{if(mode==='recall'&&!checked){state.records[session[index].id]=Learning.rate(state.records[session[index].id],'assisted',Date.now(),sessionId);save()}playModel();$('model').scrollIntoView({block:'nearest'})};
+$('settings').onclick=()=>{stop();$('response').blur();$('settingsStatus').textContent='';refreshVoices();$('settingsDialog').showModal()};$('practiceSettings').onclick=()=>$('settings').click();$('done').onclick=()=>{stop();$('settingsDialog').close();focusAnswer()};
 $('refreshVoices').onclick=refreshVoices;$('previewVoice').onclick=()=>{stop();$('settingsStatus').textContent='Playing voice sample…';speak(CARDS[0].target,'ja-JP',()=>{$('settingsStatus').textContent='Sample finished.'})};
 for(const [id,key] of [['voice','voice'],['rate','rate'],['delay','delay'],['showRomaji','romaji'],['showScript','script']]){
  const element=$(id);if(element.type==='checkbox')element.checked=state.settings[key];else if(id!=='voice')element.value=state.settings[key];
@@ -147,6 +153,10 @@ for(const [id,key] of [['voice','voice'],['rate','rate'],['delay','delay'],['sho
 }
 $('mode').onchange=()=>{$('modeHelp').textContent=$('mode').value==='repeat'?'Hear the English, then Japanese. Repeat the Japanese using keyboard dictation.':'Hear the English, then say the Japanese from memory.'};
 $('clear').onclick=()=>{if(!confirm('Clear only Japanese practice history on this browser?'))return;state.records={};state.repetition={};save();$('settingsStatus').textContent='Japanese practice history cleared.'};
+// Avoid dropping the caret when the learner taps playback or skips a card.
+for(const id of ['play','next'])$(id).onpointerdown=event=>{
+ if(document.activeElement===$('response'))event.preventDefault();
+};
 $('response').addEventListener('focus',viewport);
 window.visualViewport?.addEventListener('resize',viewport);window.visualViewport?.addEventListener('scroll',viewport);window.addEventListener('resize',viewport);
 if(synth)synth.onvoiceschanged=refreshVoices;
