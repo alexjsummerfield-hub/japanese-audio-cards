@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#244f4b"><meta name="description" content="Listen, speak and practise seven Japanese hotel phrases. No reading of Japanese required."><title>Japanese travel practice · Hotel check-in</title><link rel="stylesheet" href="style.css"><script src="cards.js" defer></script><script src="scheduler.js" defer></script><script src="app.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#244f4b"><meta name="description" content="Listen, speak and practise seven Japanese hotel phrases. No reading of Japanese required."><title>Japanese travel practice · Hotel check-in</title><link rel="stylesheet" href="style.css?v=20261030-keyboard"><script src="cards.js" defer></script><script src="scheduler.js" defer></script><script src="app.js?v=20261030-keyboard" defer></script></head>
 <body>
 <main>
 <header><a class="brand" href="./">旅 <span>Japanese travel practice</span></a><button id="settings" class="icon" aria-label="Audio and display settings">⚙</button></header>
@@ -13,13 +13,12 @@
 </section>
 <section id="practice" hidden aria-label="Phrase practice">
  <div class="practice-top"><button id="back" class="quiet">← Lesson</button><span id="progress"></span><button id="practiceSettings" class="icon" aria-label="Audio and display settings">⚙</button></div><progress id="bar" value="0" max="7" aria-label="Session progress"></progress>
- <div class="practice-scroll"><p id="instruction" class="eyebrow"></p><h1 id="prompt" class="practice-prompt"></h1><p id="context" class="context" hidden></p><p id="stage" class="stage" role="status"></p>
- <button id="play" class="audio-button">▶ Hear again</button>
- <form id="answerForm"><label for="response" class="sr-only">Your Japanese answer from keyboard dictation or typing</label><input id="response" type="text" lang="ja" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="Dictate with your Japanese keyboard…"><button id="check" type="submit" class="primary">Check answer</button></form>
+ <div class="practice-scroll"><p id="instruction" class="eyebrow"></p><h1 id="prompt" class="practice-prompt"></h1><p id="context" class="context" hidden></p><p id="stage" class="sr-only" role="status"></p>
+ <form id="answerForm"><label for="response" class="sr-only">Your Japanese answer from keyboard dictation or typing</label><input id="response" type="text" lang="ja" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="Japanese…"></form>
  <p id="feedback" role="status" hidden></p><div id="answerActions" hidden><button id="accept">Accept my answer</button><button id="reviewSoon">Review again soon</button></div>
  <section id="model" class="model" hidden aria-label="Model answer"><p class="eyebrow">LISTEN & SAY IT AGAIN</p><p id="romaji" class="romaji"></p><p id="script" lang="ja" hidden></p><button id="replayModel" class="quiet">▶ Hear Japanese model</button></section>
- <button id="reveal" class="quiet">Hear the answer</button><p id="notice" class="small" role="status"></p></div>
- <div class="next-bar"><button id="next" class="primary">Next phrase →</button></div>
+ <p id="notice" class="small" role="status"></p></div>
+ <div class="next-bar"><div class="practice-actions"><button id="play" type="button">▶ Play</button><button id="reveal" type="button">Hear answer</button><button id="check" type="submit" form="answerForm">Check</button></div><button id="next" class="primary">Next phrase →</button></div>
 </section>
 <section id="complete" hidden tabindex="-1"><p class="eyebrow">SESSION COMPLETE</p><h1>A little more<br>confidence.</h1><p id="completionText"></p><dl id="results"></dl><p id="completionNote" class="small"></p><button id="again" class="primary">Practise again →</button><button id="lesson" class="quiet">Back to lesson</button></section>
 <footer>Made for speaking, not script study.<br>Hotel phrases · 27 October course handout</footer>
