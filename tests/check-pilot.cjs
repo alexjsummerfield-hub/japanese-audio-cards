@@ -1,7 +1,8 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
-const elements=new Map(),saved=new Map();
-function node(){return {value:'7',type:'',hidden:false,dataset:{},style:{setProperty(){}},classList:{add(){},remove(){}},replaceChildren(){},append(){},add(){},focus(){},blur(){},scrollIntoView(){},setAttribute(){},addEventListener(){}}}
-const context={console,assert,setTimeout,clearTimeout,Option:class{},confirm:()=>false,innerHeight:844,localStorage:{getItem:k=>saved.get(k),setItem:(k,v)=>saved.set(k,v)},document:{getElementById(id){if(!elements.has(id))elements.set(id,node());return elements.get(id)},createElement:node,body:node(),documentElement:node(),addEventListener(){}},window:{addEventListener(){}}};
+const elements=new Map(),saved=new Map(),spoken=[],timers=new Map();let timerId=0;
+const testVoices=[{lang:'en-US',name:'US',default:true},{lang:'en-GB',name:'UK alternate'},{lang:'en-GB',name:'UK default',default:true},{lang:'ja-JP',name:'Japanese'}];
+function node(){return {value:'7',type:'',hidden:false,dataset:{},style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},replaceChildren(){},append(){},add(){},focus(){context.document.activeElement=this},blur(){if(context.document.activeElement===this)context.document.activeElement=null},scrollIntoView(){},setAttribute(){},addEventListener(){}}}
+const context={console,assert,spoken,setTimeout(fn){const id=++timerId;timers.set(id,fn);return id},clearTimeout(id){timers.delete(id)},runTimers(){for(const [id,fn] of [...timers]){timers.delete(id);fn()}},SpeechSynthesisUtterance:class{constructor(text){this.text=text}},Option:class{},confirm:()=>false,innerHeight:844,localStorage:{getItem:k=>saved.get(k),setItem:(k,v)=>saved.set(k,v)},document:{getElementById(id){if(!elements.has(id))elements.set(id,node());return elements.get(id)},createElement:node,querySelector(){return node()},body:node(),documentElement:node(),addEventListener(){}},window:{addEventListener(){},speechSynthesis:{getVoices(){return testVoices},cancel(){},speak(u){spoken.push({text:u.text,lang:u.lang,voice:u.voice?.name});u.onend()}}}};
 vm.createContext(context);
 for(const f of ['cards.js','scheduler.js','app.js'])vm.runInContext(fs.readFileSync(require('path').join(__dirname,'..',f),'utf8'),context);
 vm.runInContext(`
@@ -15,5 +16,19 @@ acceptAnswer();
 assert.equal(state.records[CARDS[0].id].lastOutcome,'correct');assert.equal(state.records[CARDS[0].id].misses,undefined);assert.equal(state.records[CARDS[0].id].streak,1);assert.equal(results[CARDS[0].id].status,'first');assert(results[CARDS[0].id].accepted);
 const n=Date.now(),miss=Learning.rate(undefined,'miss',n,1),repair=Learning.rate(miss,'correct',n+1,1);assert(repair.needsReview);assert(!Learning.rate(repair,'correct',n+Learning.DAY,2).needsReview);
 const queue=[...CARDS],ids=new Set();assert(Learning.queueRetry(queue,0,ids,2));assert.equal(queue[4].id,CARDS[0].id);assert(!Learning.queueRetry(queue,0,ids,2));
+
+// New cards announce English then Japanese; Play repeats only UK English.
+active=true;session=[CARDS[0]];index=0;mode='repeat';checked=false;spoken.length=0;
+playPrompt(true);assert.equal(spoken.length,2);assert.equal(spoken[0].lang,'en-GB');assert.equal(spoken[0].voice,'UK default');assert.equal(spoken[1].lang,'ja-JP');
+spoken.length=0;$('play').onclick();assert.equal(spoken.length,1);assert.equal(spoken[0].lang,'en-GB');
+spoken.length=0;$('reveal').onclick();runTimers();assert.equal(spoken.length,1);assert.equal(spoken[0].lang,'ja-JP');
+// Retrying the same card keeps its miss due and counts one unique phrase.
+state.records={};state.repetition={};results={[CARDS[0].id]:{checks:0,missed:false,status:'pending',accepted:false}};
+$('response').value='いいえ';checkAnswer({preventDefault(){}});assert(state.records[CARDS[0].id].needsReview);assert(checked);assert(!$('tryAgain').hidden);
+tryAgain();assert(!checked);assert.equal($('response').value,'');assert(!$('response').disabled);assert($('model').hidden);assert.equal(index,0);assert(state.records[CARDS[0].id].needsReview);
+$('response').value=CARDS[0].target;checkAnswer({preventDefault(){}});assert.equal(results[CARDS[0].id].status,'repeated');assert(state.records[CARDS[0].id].needsReview);assert.equal(Object.keys(results).length,1);
+// Accepting a false dictation mismatch removes only that failure in repeat mode.
+state.records={};state.repetition={};results={[CARDS[0].id]:{checks:0,missed:false,status:'pending',accepted:false}};checked=false;
+$('response').value='いいえ';checkAnswer({preventDefault(){}});assert(state.records[CARDS[0].id].needsReview);acceptAnswer();assert.equal(state.records[CARDS[0].id],undefined);assert.equal(results[CARDS[0].id].missed,false);
 `,context);
-console.log('Passed answer variants, false-match rejection, manual-accept rollback after model playback, independent recall interval, same-session repair, and spaced retry checks.');
+console.log('Passed answer variants, review intervals, manual acceptance, UK English voice selection, bilingual entry audio, separate English/Japanese playback, and same-card retry history.');
