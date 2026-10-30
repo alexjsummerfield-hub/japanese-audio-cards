@@ -6,10 +6,12 @@ try{const saved=JSON.parse(localStorage.getItem(STORAGE)||'null');if(saved)state
 // Keep the existing Slower preference when upgrading from the earlier 80% setting.
 if(state.settings.rate==='0.8')state.settings.rate='0.75';
 if(!['1','0.75'].includes(state.settings.rate))state.settings.rate='1';
+let selectedLesson=LESSONS.some(l=>l.id===state.settings.lesson)?state.settings.lesson:'hotel';
 const synth=window.speechSynthesis;
 let session=[],index=0,mode='repeat',sessionId=0,results={},retryIds=new Set(),attempt=null,assisted=false,checked=false,active=false,token=0,timer=null;
 function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));storageOK=true}catch{storageOK=false}updateSummary()}
-function updateSummary(){const due=CARDS.filter(c=>Learning.isDue(state.records[c.id],Date.now())).length;$('reviewSummary').textContent=storageOK?(due?`${due} phrase${due===1?' is':'s are'} ready for recall review. `:'')+'Progress stays on this device.':'Storage unavailable: progress lasts only in this tab.'}
+function lessonCards(){return selectedLesson==='all'?CARDS:CARDS.filter(c=>c.lesson===selectedLesson)}
+function updateSummary(){const due=lessonCards().filter(c=>Learning.isDue(state.records[c.id],Date.now())).length;$('reviewSummary').textContent=storageOK?(due?`${due} phrase${due===1?' is':'s are'} ready for recall review. `:'')+'Progress stays on this device.':'Storage unavailable: progress lasts only in this tab.'}
 function stop(){token++;clearTimeout(timer);timer=null;synth?.cancel()}
 function japaneseVoices(){return synth?synth.getVoices().filter(v=>/^ja(?:-|$)/i.test(v.lang)):[]}
 function voiceKey(v){return JSON.stringify([v.voiceURI,v.name,v.lang,v.localService])}
@@ -58,9 +60,10 @@ function playModel(){
  timer=setTimeout(()=>{timer=null;if(t!==token)return;$('stage').textContent='Listen and say it again';speak(session[index].target,'ja-JP',()=>{$('stage').textContent='Ready · Next when you are'},t)},Number(state.settings.delay));
 }
 function orderCards(){
- const shuffled=[...CARDS].sort(()=>Math.random()-.5);
+ const shuffled=[...lessonCards()];
+ for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}
  if(mode==='recall')shuffled.sort((a,b)=>Number(Learning.isDue(state.records[b.id],Date.now()))-Number(Learning.isDue(state.records[a.id],Date.now())));
- return shuffled.slice(0,Number($('length').value));
+ return $('length').value==='all'?shuffled:shuffled.slice(0,Number($('length').value));
 }
 function start(){
  stop();mode=$('mode').value;sessionId=++state.sessionNumber;session=orderCards();index=0;results={};retryIds=new Set();active=true;
@@ -145,9 +148,42 @@ function viewport(){
  document.body.classList.toggle('compact-practice',active&&height<560);
  if(window.requestAnimationFrame)window.requestAnimationFrame(keepAnswerVisible);
 }
-function renderPreparation(){
- $('phraseList').replaceChildren();CARDS.forEach(c=>{const row=document.createElement('div');row.className='phrase';const meaning=document.createElement('p');meaning.textContent=c.prompt;const reading=document.createElement('p');reading.className='reading';reading.textContent=c.romaji;reading.hidden=!state.settings.romaji;const button=document.createElement('button');button.textContent='▶';button.setAttribute('aria-label','Hear Japanese: '+c.prompt);button.onclick=()=>{stop();$('settingsStatus').textContent='';speak(c.target,'ja-JP',()=>{})};row.append(meaning,reading,button);$('phraseList').append(row)})
+function applyLesson(){
+ stop();
+ const lesson=LESSONS.find(l=>l.id===selectedLesson),pool=lessonCards();
+ $('lessonTitle').textContent=lesson?lesson.title:'Mixed revision';
+ $('lessonDescription').textContent=lesson?lesson.description:'Practise phrases from all eight lessons.';
+ $('lessonNumber').textContent=lesson?String(LESSONS.indexOf(lesson)+1).padStart(2,'0'):'↻';
+ $('preparationCount').textContent=pool.length+' phrases';
+ const allOption=Array.from($('length').options||[]).find(o=>o.value==='all');
+ if(allOption)allOption.textContent='All '+pool.length+' phrases';
+ state.settings.lesson=selectedLesson;save();renderPreparation();
 }
+function renderPreparation(){
+ $('phraseList').replaceChildren();lessonCards().forEach(c=>{
+  const row=document.createElement('div');row.className='phrase';
+  const meaning=document.createElement('p');meaning.textContent=c.prompt;
+  const reading=document.createElement('p');reading.className='reading';reading.textContent=c.romaji;reading.hidden=!state.settings.romaji;
+  const button=document.createElement('button');button.className='phrase-play';button.textContent='▶';button.setAttribute('aria-label','Hear Japanese: '+c.prompt);
+  button.onclick=()=>{stop();$('settingsStatus').textContent='';speak(c.target,'ja-JP')};
+  row.append(meaning,reading,button);
+  const keywords=document.createElement('div');keywords.className='phrase-keywords';
+  const label=document.createElement('p');label.className='keyword-label';label.textContent='Words to notice';keywords.append(label);
+  c.keywords.forEach(word=>{
+   const wordButton=document.createElement('button');wordButton.className='keyword';
+   wordButton.setAttribute('aria-label','Hear '+word.romaji+': '+word.meaning);
+   const term=document.createElement('strong');term.textContent='▶ '+word.romaji;
+   const gloss=document.createElement('span');gloss.textContent=word.meaning;
+   wordButton.append(term,gloss);wordButton.onclick=()=>{stop();speak(word.ja,'ja-JP')};keywords.append(wordButton);
+  });
+  row.append(keywords);
+  if(c.note||c.example){const note=document.createElement('p');note.className='preparation-context';note.textContent=[c.note,c.example].filter(Boolean).join(' ');row.append(note)}
+  $('phraseList').append(row);
+ });
+}
+$('lesson').replaceChildren(...LESSONS.map((l,i)=>new Option(String(i+1).padStart(2,'0')+' · '+l.title,l.id)),new Option('All lessons · mixed revision','all'));
+$('lesson').value=selectedLesson;
+$('lesson').onchange=()=>{selectedLesson=$('lesson').value;applyLesson()};
 $('start').onclick=start;$('again').onclick=start;$('lesson').onclick=back;$('back').onclick=back;$('play').onclick=()=>{focusAnswer();playPrompt()};$('next').onclick=next;
 $('answerForm').onsubmit=checkAnswer;$('response').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(!e.repeat)checkAnswer(e)}};
 $('accept').onclick=acceptAnswer;$('tryAgain').onclick=tryAgain;
@@ -168,4 +204,4 @@ $('response').addEventListener('focus',viewport);
 window.visualViewport?.addEventListener('resize',viewport);window.visualViewport?.addEventListener('scroll',viewport);window.addEventListener('resize',viewport);
 if(synth)synth.onvoiceschanged=refreshVoices;
 document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(active)$('stage').textContent='Paused · tap Play to resume'}});
-renderPreparation();refreshVoices();updateSummary();
+applyLesson();refreshVoices();
