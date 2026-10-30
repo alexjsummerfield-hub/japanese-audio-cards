@@ -1,10 +1,10 @@
 # Japanese audio cards
 
-Audio-first Japanese for travellers practice, beginning with seven hotel check-in phrases from the 27 October course handout.
+Audio-first Japanese for travellers practice, with 59 phrases across eight lessons from the 27 October course handout.
 
 ## Practice on iPhone
 
-Open the GitHub Pages site in Safari. Choose **Listen and repeat** to hear Japanese first, or **Recall and say** to answer an English prompt from memory. Select the Japanese keyboard and use its microphone to dictate into the answer field. Press Return or Check answer, listen to the model, then tap Next.
+Open the GitHub Pages site in Safari. Choose a lesson and open its preparation list. Each phrase has romaji, contextual keyword meanings and audio buttons for both whole phrases and keywords. Choose **Listen and repeat** to hear English followed by Japanese after a half-second pause, or **Recall and say** to answer an English prompt from memory. Select the Japanese keyboard and use its microphone to dictate into the answer field. Press Return or Check answer, listen to the model, then tap Next.
 
 No script reading is required. Romaji is shown as an optional aid; Japanese script can be enabled in settings. Browser speech synthesis supplies audio. Settings offer voice previews, normal/slower speech, and a default 1.5-second pause after submission to let keyboard dictation release its audio session.
 
@@ -14,7 +14,7 @@ Progress stays in this browser on this device under the separate `japanese-trave
 
 ## Development
 
-A static HTML, CSS and JavaScript app with no dependencies or build step. Serve the repository root with any static HTTP server. GitHub Pages uses the root of the main branch.
+A static HTML, CSS and JavaScript app with no dependencies or build step. Serve the repository root with any static HTTP server. GitHub Pages uses the root of the main branch. Lessons are selected separately, with an optional mixed revision pool. Original hotel IDs and all existing device history are retained. See CONTENT-NOTES.md for source mapping and completed placeholder patterns.
 
 The scheduler is reused from the Italian audio cards app. The Italian app and its history are unchanged. Accepted Japanese alternatives are explicit reviewed spellings, not a general semantic or pronunciation grader.
 
