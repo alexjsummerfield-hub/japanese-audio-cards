@@ -31,3 +31,10 @@
 #feedback[data-result=match]{background:#e7f2e9;border-color:#a2c5ac}
 #feedback[data-result=miss]{background:#fff0e8;border-color:#d8ab92}
 #feedback[data-result=match]::first-letter,#feedback[data-result=miss]::first-letter{font-size:20px;line-height:1;font-weight:800}
+
+.phrase>.phrase-play{grid-column:2;grid-row:1/3}
+.phrase-keywords{grid-column:1/-1;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.phrase-keywords .keyword-label{font-size:12px;letter-spacing:.04em;font-weight:650;color:var(--muted);margin-bottom:8px}
+.phrase-keywords .keyword{grid-column:auto;grid-row:auto;display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 9px;width:100%;text-align:left;min-height:44px;background:#f0f3eb;border:0;border-radius:8px;padding:9px 10px;margin-top:6px;font-size:17px;font-weight:400}
+.keyword strong{font-weight:650}.keyword span{color:var(--muted)}
+.phrase>.preparation-context{grid-column:1/-1;font-size:13px;color:var(--muted);margin-top:10px;line-height:1.4}
