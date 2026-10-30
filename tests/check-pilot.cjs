@@ -7,7 +7,7 @@ saved.set('japanese-travel-pilot-v1',JSON.stringify({settings:{rate:'0.8'}}));
 vm.createContext(context);
 for(const f of ['cards.js','scheduler.js','app.js'])vm.runInContext(fs.readFileSync(require('path').join(__dirname,'..',f),'utf8'),context);
 vm.runInContext(`
-for(const card of CARDS){for(const value of [card.target,card.kana,...card.accepted])assert(matchesJapanese(value,card));assert(!matchesJapanese('',card));assert(!matchesJapanese('いいえ',card))}
+for(const card of CARDS){for(const value of [card.target,card.kana,...card.accepted])assert(matchesJapanese(value,card));assert(!matchesJapanese('',card));assert(!matchesJapanese('これはテストではありません',card))}
 assert(matchesJapanese('Ｗｉ－Ｆｉ は ありますか？',CARDS[4]));assert(!matchesJapanese('ワイファイが使えます',CARDS[5]));
 mode='recall';session=[CARDS[0]];index=0;sessionId=1;assisted=true;
 results={[CARDS[0].id]:{checks:1,missed:true,status:'pending',accepted:false}};
@@ -18,6 +18,14 @@ assert.equal(state.records[CARDS[0].id].lastOutcome,'correct');assert.equal(stat
 const n=Date.now(),miss=Learning.rate(undefined,'miss',n,1),repair=Learning.rate(miss,'correct',n+1,1);assert(repair.needsReview);assert(!Learning.rate(repair,'correct',n+Learning.DAY,2).needsReview);
 const queue=[...CARDS],ids=new Set();assert(Learning.queueRetry(queue,0,ids,2));assert.equal(queue[4].id,CARDS[0].id);assert(!Learning.queueRetry(queue,0,ids,2));
 
+// Content integrity and lesson isolation.
+assert.equal(CARDS.length,59);assert.equal(LESSONS.length,8);assert.equal(new Set(CARDS.map(c=>c.id)).size,CARDS.length);
+for(const c of CARDS){assert(LESSONS.some(l=>l.id===c.lesson));assert(c.keywords.length);for(const w of c.keywords)assert(w.ja&&w.romaji&&w.meaning);assert(!/XXX|_{2,}|〜|[*]{2,}/i.test(c.target+c.prompt+c.romaji));}
+selectedLesson='hotel';assert.equal(lessonCards().length,7);assert(lessonCards().every(c=>c.id.startsWith('hotel-')));
+selectedLesson='introductions';assert.equal(lessonCards().length,5);assert(orderCards().every(c=>c.lesson==='introductions'));
+selectedLesson='all';assert.equal(lessonCards().length,59);selectedLesson='hotel';
+assert(CARDS.find(c=>c.id==='hotel-04').keywords.some(w=>w.romaji==='chōshoku'&&w.meaning==='breakfast'));
+assert(CARDS.find(c=>c.id==='hotel-07').keywords.some(w=>w.romaji==='nimotsu'&&w.meaning.includes('luggage')));
 // New cards pause half a second after default English; all Japanese uses the chosen speed.
 active=true;session=[CARDS[0]];index=0;mode='repeat';checked=false;spoken.length=0;
 assert.equal(state.settings.rate,'0.75');
@@ -37,4 +45,4 @@ $('response').value=CARDS[0].target;checkAnswer({preventDefault(){}});assert.equ
 state.records={};state.repetition={};results={[CARDS[0].id]:{checks:0,missed:false,status:'pending',accepted:false}};checked=false;
 $('response').value='いいえ';checkAnswer({preventDefault(){}});assert(state.records[CARDS[0].id].needsReview);acceptAnswer();assert.equal(state.records[CARDS[0].id],undefined);assert.equal(results[CARDS[0].id].missed,false);
 `,context);
-console.log('Passed answer variants, review intervals, manual acceptance, default English voice selection, 500ms audio gap, 75% Japanese speed, preference migration, cancellation during the gap, bilingual entry audio, separate English/Japanese playback, and same-card retry history.');
+console.log('Passed 59-card content and keyword checks, lesson isolation, answer variants, review intervals, manual acceptance, default English voice selection, 500ms audio gap, 75% Japanese speed, preference migration, cancellation during the gap, bilingual entry audio, separate English/Japanese playback, and same-card retry history.');
