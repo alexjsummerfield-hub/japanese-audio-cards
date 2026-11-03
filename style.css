@@ -38,3 +38,9 @@
 .phrase-keywords .keyword{grid-column:auto;grid-row:auto;display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 9px;width:100%;text-align:left;min-height:44px;background:#f0f3eb;border:0;border-radius:8px;padding:9px 10px;margin-top:6px;font-size:17px;font-weight:400}
 .keyword strong{font-weight:650}.keyword span{color:var(--muted)}
 .phrase>.preparation-context{grid-column:1/-1;font-size:13px;color:var(--muted);margin-top:10px;line-height:1.4}
+
+.autoplay-mode #answerForm,.autoplay-mode #feedback,.autoplay-mode #answerActions,.autoplay-mode .practice-actions{display:none!important}
+.autoplay-status{font-size:15px;color:var(--muted);padding:10px 12px;background:#e9eee3;border-radius:10px}
+.autoplay-mode .model{margin-top:24px;padding-top:22px}
+.autoplay-mode .romaji{font-size:25px;line-height:1.4}
+.autoplay-mode .next-bar .primary{min-height:56px}

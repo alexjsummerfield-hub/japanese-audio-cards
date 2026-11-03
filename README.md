@@ -19,3 +19,7 @@ A static HTML, CSS and JavaScript app with no dependencies or build step. Serve 
 The scheduler is reused from the Italian audio cards app. The Italian app and its history are unchanged. Accepted Japanese alternatives are explicit reviewed spellings, not a general semantic or pronunciation grader.
 
 Run checks with `node tests/check-pilot.cjs`. Browser checks covered matching, manual acceptance, skipped-card summaries, both modes and the 390px phone layout. Actual iPhone dictation, keyboard behaviour and audio quality still require device testing.
+
+## Autoplay
+
+Autoplay uses the existing browser voices with the selected Japanese speed. It plays the full selected lesson (or all lessons in course order for mixed revision) three times: once in lesson order, then twice shuffled without replacement. English is followed by a 500ms pause and Japanese, then a 2-second pause before the next card. Play/Pause replaces Next; resuming during a phrase restarts that phrase. A pause after completed Japanese continues with the next phrase. The page pauses when hidden; background and lock-screen playback are not included. Autoplay does not write attempts or change recall history. No prerecorded audio or runtime dependencies are used.

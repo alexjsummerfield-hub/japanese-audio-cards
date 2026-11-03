@@ -9,6 +9,7 @@ if(!['1','0.75'].includes(state.settings.rate))state.settings.rate='1';
 let selectedLesson=LESSONS.some(l=>l.id===state.settings.lesson)?state.settings.lesson:'hotel';
 const synth=window.speechSynthesis;
 let session=[],index=0,mode='repeat',sessionId=0,results={},retryIds=new Set(),attempt=null,assisted=false,checked=false,active=false,token=0,timer=null;
+let autoplayQueue=[],autoplayPaused=false,autoplayCardComplete=false;
 function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));storageOK=true}catch{storageOK=false}updateSummary()}
 function lessonCards(){return selectedLesson==='all'?CARDS:CARDS.filter(c=>c.lesson===selectedLesson)}
 function updateSummary(){const due=lessonCards().filter(c=>Learning.isDue(state.records[c.id],Date.now())).length;$('reviewSummary').textContent=storageOK?(due?`${due} phrase${due===1?' is':'s are'} ready for recall review. `:'')+'Progress stays on this device.':'Storage unavailable: progress lasts only in this tab.'}
@@ -32,9 +33,9 @@ function speak(text,lang,done=()=>{},t=token){
  utterance.onend=()=>{if(t===token)done()};utterance.onerror=()=>{if(t===token)audioFailure('Audio could not play. Tap Play to retry, or choose another voice in settings.')};
  synth.speak(utterance);
 }
-function audioFailure(message){$('notice').textContent=message;$('settingsStatus').textContent=message;$('stage').textContent='Audio unavailable · you can retry';$('response').disabled=false;$('check').disabled=false}
+function audioFailure(message){if(active&&mode==='autoplay'){pauseAutoplay();$('notice').textContent=message;return}$('notice').textContent=message;$('settingsStatus').textContent=message;$('stage').textContent='Audio unavailable · you can retry';$('response').disabled=false;$('check').disabled=false}
 function focusAnswer(){
- if(!active||checked||$('settingsDialog').open)return;
+ if(!active||mode==='autoplay'||checked||$('settingsDialog').open)return;
  const field=$('response');
  // Focus during the tap itself: iPhone cannot open its keyboard from speech's onend.
  if(document.activeElement!==field)field.focus({preventScroll:true});
@@ -54,7 +55,7 @@ function playPrompt(includeJapanese=false){
   },500);
  },t);
 }
-function showModel(){const c=session[index];$('model').hidden=false;$('romaji').textContent=c.romaji;$('romaji').hidden=!state.settings.romaji;$('script').textContent=c.target;$('script').hidden=!state.settings.script}
+function showModel(){const c=session[index];$('modelLabel').textContent=mode==='autoplay'?'JAPANESE':'LISTEN & SAY IT AGAIN';$('model').hidden=false;$('romaji').textContent=c.romaji;$('romaji').hidden=!state.settings.romaji;$('script').textContent=c.target;$('script').hidden=!state.settings.script}
 function playModel(){
  if(!active)return;stop();$('response').blur();assisted=true;showModel();const t=token;$('stage').textContent='Preparing Japanese audio…';
  timer=setTimeout(()=>{timer=null;if(t!==token)return;$('stage').textContent='Listen and say it again';speak(session[index].target,'ja-JP',()=>{$('stage').textContent='Ready · Next when you are'},t)},Number(state.settings.delay));
@@ -65,8 +66,61 @@ function orderCards(){
  if(mode==='recall')shuffled.sort((a,b)=>Number(Learning.isDue(state.records[b.id],Date.now()))-Number(Learning.isDue(state.records[a.id],Date.now())));
  return $('length').value==='all'?shuffled:shuffled.slice(0,Number($('length').value));
 }
+function orderedLessonCards(){
+ return selectedLesson==='all'?LESSONS.flatMap(l=>CARDS.filter(c=>c.lesson===l.id)):lessonCards();
+}
+function startAutoplay(){
+ autoplayQueue=Autoplay.plan(orderedLessonCards());session=autoplayQueue.map(item=>item.card);index=0;
+ if(!session.length)return;
+ active=true;autoplayPaused=false;autoplayCardComplete=false;
+ $('response').blur();$('setup').hidden=true;$('complete').hidden=true;$('practice').hidden=false;
+ document.body.classList.add('practising','autoplay-mode');
+ $('feedback').hidden=true;$('answerActions').hidden=true;$('notice').textContent='';$('autoplayStatus').hidden=false;
+ playAutoplayCard();
+}
+function showAutoplayCard(){
+ const item=autoplayQueue[index],c=item.card;
+ $('progress').textContent=`Pass ${item.pass} / 3 · ${item.position} / ${item.count}`;
+ $('bar').max=session.length;$('bar').value=index;
+ $('instruction').textContent='AUTOPLAY · JUST LISTEN';$('prompt').textContent=c.prompt;
+ $('context').textContent=c.note;$('context').hidden=!c.note;
+ $('autoplayStatus').textContent=item.pass===1?'First pass · lesson order':'Shuffled pass · each phrase once';
+ showModel();viewport();
+}
+function playAutoplayCard(){
+ if(!active||mode!=='autoplay')return;
+ stop();autoplayPaused=false;autoplayCardComplete=false;showAutoplayCard();
+ $('next').textContent='Ⅱ Pause';$('next').setAttribute('aria-label','Pause autoplay');
+ const t=token,c=session[index];$('stage').textContent='Listen to the English prompt…';
+ speak(c.prompt,'en',()=>{
+  timer=setTimeout(()=>{
+   timer=null;if(t!==token)return;$('stage').textContent='Listen to the Japanese model…';
+   speak(c.target,'ja-JP',()=>{
+    autoplayCardComplete=true;$('stage').textContent='A moment before the next phrase';
+    timer=setTimeout(()=>{timer=null;if(t===token)advanceAutoplay()},2000);
+   },t);
+  },500);
+ },t);
+}
+function pauseAutoplay(message){
+ if(!active||mode!=='autoplay')return;
+ stop();autoplayPaused=true;$('next').textContent='▶ Play';$('next').setAttribute('aria-label','Resume autoplay');$('autoplayStatus').textContent=message||(autoplayCardComplete?'Paused · Play continues with the next phrase':'Paused · Play restarts this phrase');
+}
+function advanceAutoplay(){
+ if(!active||mode!=='autoplay')return;
+ if(index+1>=session.length){finishAutoplay();return}
+ index++;playAutoplayCard();
+}
+function finishAutoplay(){
+ stop();active=false;document.body.classList.remove('practising','autoplay-mode');
+ $('practice').hidden=true;$('complete').hidden=false;$('results').replaceChildren();
+ const unique=autoplayQueue[0].count;
+ $('completionText').textContent=`${unique} phrases · ${session.length} phrase plays · 3 complete passes`;
+ $('completionNote').textContent='One pass in lesson order, followed by two shuffled passes. Listening does not change your recall review scores.';
+ $('complete').focus();updateSummary();
+}
 function start(){
- stop();mode=$('mode').value;sessionId=++state.sessionNumber;session=orderCards();index=0;results={};retryIds=new Set();active=true;
+ stop();mode=$('mode').value;if(mode==='autoplay'){startAutoplay();return}document.body.classList.remove('autoplay-mode');$('autoplayStatus').hidden=true;sessionId=++state.sessionNumber;session=orderCards();index=0;results={};retryIds=new Set();active=true;
  $('setup').hidden=true;$('complete').hidden=true;$('practice').hidden=false;document.body.classList.add('practising');save();showCard();focusAnswer();playPrompt(mode==='repeat');
 }
 function showCard(){
@@ -76,7 +130,7 @@ function showCard(){
  $('progress').textContent=`${index+1} / ${session.length}${c._retry?' · Review':''}`;$('bar').max=session.length;$('bar').value=index;
  $('instruction').textContent=mode==='repeat'?'LISTEN & REPEAT':'RECALL & SAY';$('prompt').textContent=c.prompt;$('context').textContent=c.note;$('context').hidden=!c.note;
  $('response').value='';$('response').disabled=false;$('check').disabled=false;$('model').hidden=true;$('feedback').hidden=true;$('answerActions').hidden=true;$('accept').hidden=false;$('reveal').hidden=false;$('notice').textContent='';
- $('stage').textContent='Ready to listen';$('next').textContent=index===session.length-1?'Finish session ✓':'Next phrase →';viewport();
+ $('next').removeAttribute('aria-label');$('stage').textContent='Ready to listen';$('next').textContent=index===session.length-1?'Finish session ✓':'Next phrase →';viewport();
 }
 function checkAnswer(event){
  event.preventDefault();if(!active||checked)return;
@@ -118,7 +172,7 @@ function tryAgain(){
  focusAnswer();
 }
 function next(){
- if(!active)return;stop();
+ if(!active)return;if(mode==='autoplay'){if(autoplayPaused){if(autoplayCardComplete){advanceAutoplay();return}playAutoplayCard()}else pauseAutoplay();return}stop();
  if(results[session[index].id]?.missed)Learning.queueRetry(session,index,retryIds,2);
  if(index+1>=session.length){finish();return}index++;showCard();focusAnswer();playPrompt(mode==='repeat');
 }
@@ -133,7 +187,7 @@ function finish(){
  $('completionNote').textContent=(mode==='repeat'?'Repetition builds familiarity. Try Recall and say when you feel ready; repeating a model does not advance recall reviews.':'Independent recall advances reviews through 1, 3, 7, 14 and 30 days. Assisted answers and same-session repairs stay due for a later independent review.')+(accepted?` ${accepted} manually accepted answer${accepted===1?'':'s'} included.`:'')+(pending?' Skipped phrases are included in “Not yet matched”; skipping does not record a failure.':'');
  $('complete').focus();updateSummary();
 }
-function back(){stop();active=false;$('response').blur();document.body.classList.remove('practising');$('practice').hidden=true;$('complete').hidden=true;$('setup').hidden=false;updateSummary()}
+function back(){stop();active=false;document.body.classList.remove('autoplay-mode');$('response').blur();document.body.classList.remove('practising');$('practice').hidden=true;$('complete').hidden=true;$('setup').hidden=false;updateSummary()}
 function keepAnswerVisible(){
  if(!active||checked||document.activeElement!==$('response'))return;
  const scroller=document.querySelector('.practice-scroll'),field=$('response').getBoundingClientRect(),area=scroller.getBoundingClientRect();
@@ -184,17 +238,23 @@ function renderPreparation(){
 $('lesson').replaceChildren(...LESSONS.map((l,i)=>new Option(String(i+1).padStart(2,'0')+' · '+l.title,l.id)),new Option('All lessons · mixed revision','all'));
 $('lesson').value=selectedLesson;
 $('lesson').onchange=()=>{selectedLesson=$('lesson').value;applyLesson()};
-$('start').onclick=start;$('again').onclick=start;$('lesson').onclick=back;$('back').onclick=back;$('play').onclick=()=>{focusAnswer();playPrompt()};$('next').onclick=next;
+$('start').onclick=start;$('again').onclick=start;$('backToLesson').onclick=back;$('back').onclick=back;$('play').onclick=()=>{focusAnswer();playPrompt()};$('next').onclick=next;
 $('answerForm').onsubmit=checkAnswer;$('response').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(!e.repeat)checkAnswer(e)}};
 $('accept').onclick=acceptAnswer;$('tryAgain').onclick=tryAgain;
 $('reveal').onclick=()=>{if(mode==='recall'&&!checked){state.records[session[index].id]=Learning.rate(state.records[session[index].id],'assisted',Date.now(),sessionId);save()}playModel();$('model').scrollIntoView({block:'nearest'})};
-$('settings').onclick=()=>{stop();$('response').blur();$('settingsStatus').textContent='';refreshVoices();$('settingsDialog').showModal()};$('practiceSettings').onclick=()=>$('settings').click();$('done').onclick=()=>{stop();$('settingsDialog').close();focusAnswer()};
+$('settings').onclick=()=>{if(active&&mode==='autoplay')pauseAutoplay();stop();$('response').blur();$('settingsStatus').textContent='';refreshVoices();$('settingsDialog').showModal()};$('practiceSettings').onclick=()=>$('settings').click();$('done').onclick=()=>{stop();$('settingsDialog').close();focusAnswer()};
 $('refreshVoices').onclick=refreshVoices;$('previewVoice').onclick=()=>{stop();$('settingsStatus').textContent='Playing voice sample…';speak(CARDS[0].target,'ja-JP',()=>{$('settingsStatus').textContent='Sample finished.'})};
 for(const [id,key] of [['voice','voice'],['rate','rate'],['delay','delay'],['showRomaji','romaji'],['showScript','script']]){
  const element=$(id);if(element.type==='checkbox')element.checked=state.settings[key];else if(id!=='voice')element.value=state.settings[key];
  element.onchange=()=>{state.settings[key]=element.type==='checkbox'?element.checked:element.value;save();renderPreparation();if(active&&!$('model').hidden)showModel();if(id==='rate'||id==='voice')$('previewVoice').click()};
 }
-$('mode').onchange=()=>{$('modeHelp').textContent=$('mode').value==='repeat'?'Hear the English, then Japanese. Repeat the Japanese using keyboard dictation.':'Hear the English, then say the Japanese from memory.'};
+function updateMode(){
+ const selected=$('mode').value,isAutoplay=selected==='autoplay';
+ $('modeHelp').textContent=isAutoplay?'Just listen to the whole lesson three times: in order, then two shuffled passes. Keep this page open; it pauses when you leave.':selected==='repeat'?'Hear the English, then Japanese. Repeat the Japanese using keyboard dictation.':'Hear the English, then say the Japanese from memory.';
+ $('lengthSetting').hidden=isAutoplay;
+ $('start').textContent=isAutoplay?'Start autoplay →':'Start practice →';
+}
+$('mode').onchange=updateMode;
 $('clear').onclick=()=>{if(!confirm('Clear only Japanese practice history on this browser?'))return;state.records={};state.repetition={};save();$('settingsStatus').textContent='Japanese practice history cleared.'};
 // Avoid dropping the caret when the learner taps playback or skips a card.
 for(const id of ['play','next'])$(id).onpointerdown=event=>{
@@ -203,5 +263,5 @@ for(const id of ['play','next'])$(id).onpointerdown=event=>{
 $('response').addEventListener('focus',viewport);
 window.visualViewport?.addEventListener('resize',viewport);window.visualViewport?.addEventListener('scroll',viewport);window.addEventListener('resize',viewport);
 if(synth)synth.onvoiceschanged=refreshVoices;
-document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(active)$('stage').textContent='Paused · tap Play to resume'}});
-applyLesson();refreshVoices();
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(active&&mode==='autoplay'){if(!autoplayPaused)pauseAutoplay('Paused while away · tap Play to continue');return}stop();if(active)$('stage').textContent='Paused · tap Play to resume'}});
+applyLesson();refreshVoices();updateMode();
