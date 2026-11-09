@@ -1,12 +1,12 @@
 # Japanese audio cards
 
-Audio-first Japanese for travellers practice, with 59 phrases across eight lessons from the 27 October course handout.
+Audio-first Japanese for travellers practice, with 101 phrases across twelve lessons from the supplied course handouts.
 
 ## Practice on iPhone
 
-Open the GitHub Pages site in Safari. Choose a lesson and open its preparation list. Each phrase has romaji, contextual keyword meanings and audio buttons for both whole phrases and keywords. Choose **Listen and repeat** to hear English followed by Japanese after a half-second pause, or **Recall and say** to answer an English prompt from memory. Select the Japanese keyboard and use its microphone to dictate into the answer field. Press Return or Check answer, listen to the model, then tap Next.
+Open the GitHub Pages site in Safari. Choose a lesson and open its preparation list. Each phrase has romaji, contextual keyword meanings and audio buttons for both whole phrases and keywords. Autoplay is the first and default practice option. Choose **Listen and repeat** to hear English followed by Japanese after a half-second pause, or **Recall and say** to answer an English prompt from memory. Select the Japanese keyboard and use its microphone to dictate into the answer field. Press Return or Check answer, listen to the model, then tap Next.
 
-No script reading is required. Romaji is shown as an optional aid; Japanese script can be enabled in settings. Browser speech synthesis supplies audio. Settings offer voice previews, normal/slower speech, and a default 1.5-second pause after submission to let keyboard dictation release its audio session.
+No script reading is required. Romaji is shown as an optional aid; Japanese script can be enabled in settings. Browser speech synthesis supplies audio. Settings offer voice previews, normal (100%), slower (75%) and extra slow (60%) Japanese speech, and a default 1.5-second pause after submission to let keyboard dictation release its audio session.
 
 ## Learning history
 
@@ -22,4 +22,10 @@ Run checks with `node tests/check-pilot.cjs`. Browser checks covered matching, m
 
 ## Autoplay
 
-Autoplay uses the existing browser voices with the selected Japanese speed. It plays the full selected lesson (or all lessons in course order for mixed revision) three times: once in lesson order, then twice shuffled without replacement. English is followed by a 500ms pause and Japanese, then a 2-second pause before the next card. Play/Pause replaces Next; resuming during a phrase restarts that phrase. A pause after completed Japanese continues with the next phrase. The page pauses when hidden; background and lock-screen playback are not included. Autoplay does not write attempts or change recall history. No prerecorded audio or runtime dependencies are used.
+Autoplay uses the existing browser voices with the selected Japanese speed. It plays the full selected lesson (or all lessons in course order for mixed revision) three times: once in lesson order, then twice shuffled without replacement. English is followed by a 500ms pause and Japanese. Japanese plays twice on the first pass, separated by 800ms, and once on the two shuffled passes. A 2-second pause precedes the next card. Play/Pause replaces Next; resuming during a phrase restarts that phrase. A pause after completed Japanese continues with the next phrase. The page pauses when hidden; background and lock-screen playback are not included. Autoplay does not write attempts or change recall history. No prerecorded audio or runtime dependencies are used.
+
+## Voices and dimmed controls
+
+Settings offer an English voice chooser and preview using the voices Safari exposes. Automatic selection prefers voices identified as Premium or Enhanced, then a browser default. An explicit choice is remembered. Accessibility’s selected voice is not necessarily exposed to web pages. Compare Japanese speeds plays the same phrase at 100% and then the chosen slower rate (75% when Normal is selected).
+
+During autoplay, **Dim & lock screen** covers the page and blocks its controls without stopping speech. It also activates after 30 seconds without interaction by default; disable automatic dimming in settings if preferred. Tap once to wake the shield, then separately tap **Unlock controls**. It dims the page rather than adjusting hardware brightness. A supported browser is asked to keep the screen awake during playback; this can be refused by the device. Keep Safari visible: OS lock and background playback are not supported.

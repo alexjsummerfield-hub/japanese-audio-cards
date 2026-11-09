@@ -1,11 +1,11 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const elements=new Map(),saved=new Map(),spoken=[],timers=new Map(),delays=[],events=new Map();let timerId=0;
 const testVoices=[{lang:'en-US',name:'US',default:true},{lang:'en-GB',name:'UK alternate'},{lang:'en-GB',name:'UK default',default:true},{lang:'ja-JP',name:'Japanese'}];
-function node(){return {value:'7',type:'',hidden:false,dataset:{},style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},replaceChildren(){},append(){},add(){},focus(){context.document.activeElement=this},blur(){if(context.document.activeElement===this)context.document.activeElement=null},scrollIntoView(){},setAttribute(){},removeAttribute(){},addEventListener(){}}}
-const context={console,assert,spoken,delays,events,setTimeout(fn,delay){delays.push(delay);const id=++timerId;timers.set(id,fn);return id},clearTimeout(id){timers.delete(id)},runTimers(){for(const [id,fn] of [...timers]){timers.delete(id);fn()}},SpeechSynthesisUtterance:class{constructor(text){this.text=text}},Option:class{},confirm:()=>false,innerHeight:844,localStorage:{getItem:k=>saved.get(k),setItem:(k,v)=>saved.set(k,v)},document:{getElementById(id){if(!elements.has(id))elements.set(id,node());return elements.get(id)},createElement:node,querySelector(){return node()},body:node(),documentElement:node(),addEventListener(name,fn){events.set(name,fn)}},window:{addEventListener(){},speechSynthesis:{getVoices(){return testVoices},cancel(){},speak(u){spoken.push({text:u.text,lang:u.lang,voice:u.voice?.name,rate:u.rate});u.onend()}}}};
+function node(){return {value:'7',type:'',hidden:false,dataset:{},style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},replaceChildren(){},append(){},add(){},focus(){context.document.activeElement=this},blur(){if(context.document.activeElement===this)context.document.activeElement=null},scrollIntoView(){},contains(target){return target===this||this===elements.get('pocketShield')&&target===elements.get('pocketUnlock')},setAttribute(){},removeAttribute(){},addEventListener(){}}}
+const context={console,assert,spoken,delays,events,testVoices,setTimeout(fn,delay){delays.push(delay);const id=++timerId;timers.set(id,{fn,delay});return id},clearTimeout(id){timers.delete(id)},runTimers(maxDelay=5000){for(const [id,{fn,delay}] of [...timers]){if(delay>maxDelay)continue;timers.delete(id);fn()}},SpeechSynthesisUtterance:class{constructor(text){this.text=text}},Option:class{},confirm:()=>false,innerHeight:844,localStorage:{getItem:k=>saved.get(k),setItem:(k,v)=>saved.set(k,v)},document:{getElementById(id){if(!elements.has(id))elements.set(id,node());return elements.get(id)},createElement:node,querySelector(){return node()},body:node(),documentElement:node(),addEventListener(name,fn){events.set(name,fn)}},window:{addEventListener(){},speechSynthesis:{getVoices(){return testVoices},cancel(){},speak(u){spoken.push({text:u.text,lang:u.lang,voice:u.voice?.name,rate:u.rate});u.onend()}}}};
 saved.set('japanese-travel-pilot-v1',JSON.stringify({settings:{rate:'0.8'}}));
 vm.createContext(context);
-for(const f of ['cards.js','scheduler.js','autoplay.js','app.js'])vm.runInContext(fs.readFileSync(require('path').join(__dirname,'..',f),'utf8'),context);
+for(const f of ['cards.js','counters.js','scheduler.js','autoplay.js','pocket.js','app.js'])vm.runInContext(fs.readFileSync(require('path').join(__dirname,'..',f),'utf8'),context);
 vm.runInContext(`
 for(const card of CARDS){for(const value of [card.target,card.kana,...card.accepted])assert(matchesJapanese(value,card));assert(!matchesJapanese('',card));assert(!matchesJapanese('これはテストではありません',card))}
 assert(matchesJapanese('Ｗｉ－Ｆｉ は ありますか？',CARDS[4]));assert(!matchesJapanese('ワイファイが使えます',CARDS[5]));
@@ -19,11 +19,11 @@ const n=Date.now(),miss=Learning.rate(undefined,'miss',n,1),repair=Learning.rate
 const queue=[...CARDS],ids=new Set();assert(Learning.queueRetry(queue,0,ids,2));assert.equal(queue[4].id,CARDS[0].id);assert(!Learning.queueRetry(queue,0,ids,2));
 
 // Content integrity and lesson isolation.
-assert.equal(CARDS.length,59);assert.equal(LESSONS.length,8);assert.equal(new Set(CARDS.map(c=>c.id)).size,CARDS.length);
+assert.equal(CARDS.length,101);assert.equal(LESSONS.length,12);assert.equal(new Set(CARDS.map(c=>c.id)).size,CARDS.length);
 for(const c of CARDS){assert(LESSONS.some(l=>l.id===c.lesson));assert(c.keywords.length);for(const w of c.keywords)assert(w.ja&&w.romaji&&w.meaning);assert(!/XXX|_{2,}|〜|[*]{2,}/i.test(c.target+c.prompt+c.romaji));}
 selectedLesson='hotel';assert.equal(lessonCards().length,7);assert(lessonCards().every(c=>c.id.startsWith('hotel-')));
 selectedLesson='introductions';assert.equal(lessonCards().length,5);assert(orderCards().every(c=>c.lesson==='introductions'));
-selectedLesson='all';assert.equal(lessonCards().length,59);selectedLesson='hotel';
+selectedLesson='all';assert.equal(lessonCards().length,101);selectedLesson='hotel';
 assert(CARDS.find(c=>c.id==='hotel-04').keywords.some(w=>w.romaji==='chōshoku'&&w.meaning==='breakfast'));
 assert(CARDS.find(c=>c.id==='hotel-07').keywords.some(w=>w.romaji==='nimotsu'&&w.meaning.includes('luggage')));
 // New cards pause half a second after default English; all Japanese uses the chosen speed.
@@ -49,20 +49,34 @@ $('response').value='いいえ';checkAnswer({preventDefault(){}});assert(state.r
 selectedLesson='hotel';const pool=orderedLessonCards(),sequence=Autoplay.plan(pool,()=>0);
 assert.equal(sequence.length,21);assert.deepEqual(sequence.slice(0,7).map(x=>x.card.id),pool.map(c=>c.id));
 for(let pass=1;pass<=3;pass++){const entries=sequence.filter(x=>x.pass===pass);assert.equal(entries.length,7);assert.equal(new Set(entries.map(x=>x.card.id)).size,7);assert.equal(entries[0].position,1);assert.equal(entries[6].position,7);}
-selectedLesson='all';assert.equal(orderedLessonCards()[0].lesson,'introductions');assert.equal(Autoplay.plan(orderedLessonCards()).length,177);selectedLesson='hotel';
+selectedLesson='all';assert.equal(orderedLessonCards()[0].lesson,'introductions');assert.equal(Autoplay.plan(orderedLessonCards()).length,303);selectedLesson='hotel';
 const historyBefore=JSON.stringify({records:state.records,repetition:state.repetition,sessionNumber:state.sessionNumber});
 mode='autoplay';spoken.length=0;startAutoplay();assert.equal(spoken.length,1);assert.equal(spoken[0].lang,'en');
 next();assert(autoplayPaused);runTimers();assert.equal(spoken.length,1);next();assert(!autoplayPaused);assert.equal(index,0);
-runTimers();assert(autoplayCardComplete);assert.equal(spoken[spoken.length-1].lang,'ja-JP');
+runTimers();assert(!autoplayCardComplete);runTimers();assert(autoplayCardComplete);assert.equal(spoken[spoken.length-1].lang,'ja-JP');
 next();assert(autoplayPaused);next();assert.equal(index,1);assert(!autoplayPaused);
 // Leaving the page pauses; returning does not start speech unexpectedly.
 document.hidden=true;events.get('visibilitychange')();assert(autoplayPaused);document.hidden=false;
 back();assert(!active);
-// A fresh uninterrupted session has exactly 21 bilingual plays and no score changes.
+// The dim shield never interrupts speech, and requires wake then unlock.
+mode='autoplay';startAutoplay();const beforeLock=token;Pocket.lock();assert(Pocket.locked);assert.equal(token,beforeLock);
+const tap={target:$('pocketUnlock'),preventDefault(){},stopPropagation(){}};
+$('pocketShield').onclick(tap);assert(Pocket.awake);assert(Pocket.locked);
+$('pocketShield').onclick(tap);assert(!Pocket.locked);
+let blocked=false;Pocket.lock();events.get('click')({target:$('next'),preventDefault(){blocked=true},stopImmediatePropagation(){}});assert(blocked);back();assert(!Pocket.locked);
+// A fresh uninterrupted session has 21 English and 28 Japanese plays and no score changes.
 mode='autoplay';spoken.length=0;startAutoplay();let guard=0;
 while(active&&guard++<100)runTimers();
-assert(!active);assert.equal(spoken.length,42);assert.equal(spoken.filter(x=>x.lang==='en').length,21);assert.equal(spoken.filter(x=>x.lang==='ja-JP').length,21);
+assert(!active);assert.equal(spoken.length,49);assert.equal(spoken.filter(x=>x.lang==='en').length,21);assert.equal(spoken.filter(x=>x.lang==='ja-JP').length,28);
 assert.equal(JSON.stringify({records:state.records,repetition:state.repetition,sessionNumber:state.sessionNumber}),historyBefore);
 assert($('completionText').textContent.includes('21 phrase plays'));assert($('completionText').textContent.includes('3 complete passes'));
+// Speech selection and speed comparison use explicit settings.
+testVoices.push({name:'Better (Premium)',lang:'en-AU',voiceURI:'premium'});state.settings.englishVoice='auto';
+spoken.length=0;speak('Hello','en');assert.equal(spoken[0].voice,'Better (Premium)');
+state.settings.englishVoice=voiceKey(testVoices[1]);spoken.length=0;speak('Hello','en');assert.equal(spoken[0].voice,'UK alternate');
+state.settings.rate='0.6';spoken.length=0;$('compareSpeed').onclick();runTimers();assert.deepEqual(spoken.map(x=>x.rate),[1,0.6]);assert.equal(state.settings.rate,'0.6');
+assert(CARDS.filter(c=>c.source==='counters').every(c=>c.spoken&&c.keywords.length));
+assert(CARDS.some(c=>c.prompt.includes('203')&&c.spoken.includes('にまるさん')));
+assert(CARDS.some(c=>c.prompt.includes('two cats')||c.prompt.includes('2 cats')));
 `,context);
-console.log('Passed Autoplay ordering, no replacement, three passes, pause/resume, visibility handling, completion and untouched history; 59-card content and keyword checks, lesson isolation, answer variants, review intervals, manual acceptance, default English voice selection, 500ms audio gap, 75% Japanese speed, preference migration, cancellation during the gap, bilingual entry audio, separate English/Japanese playback, and same-card retry history.');
+console.log('Passed Autoplay ordering, no replacement, three passes, pause/resume, visibility handling, completion and untouched history; 101-card content and keyword checks, lesson isolation, answer variants, review intervals, manual acceptance, default English voice selection, 500ms audio gap, 75% Japanese speed, preference migration, cancellation during the gap, bilingual entry audio, separate English/Japanese playback, and same-card retry history.');
