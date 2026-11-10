@@ -1,12 +1,12 @@
 'use strict';
 const $=id=>document.getElementById(id), STORAGE='japanese-travel-pilot-v1';
-let state={records:{},repetition:{},sessionNumber:0,settings:{voice:'auto',englishVoice:'auto',autoDim:true,rate:'1',delay:'1500',romaji:true,script:false}};
+let state={records:{},repetition:{},sessionNumber:0,settings:{voice:'auto',englishVoice:'auto',rate:'1',delay:'1500',romaji:true,script:false}};
 let storageOK=true;
 try{const saved=JSON.parse(localStorage.getItem(STORAGE)||'null');if(saved)state={...state,...saved,settings:{...state.settings,...saved.settings}}}catch{storageOK=false}
 // Keep the existing Slower preference when upgrading from the earlier 80% setting.
 if(state.settings.rate==='0.8')state.settings.rate='0.75';
 if(!['1','0.75','0.6'].includes(state.settings.rate))state.settings.rate='1';
-let selectedLesson=LESSONS.some(l=>l.id===state.settings.lesson)?state.settings.lesson:'hotel';
+let selectedLesson=LESSONS.some(l=>l.id===state.settings.lesson)?state.settings.lesson:'basic-numbers';
 const synth=window.speechSynthesis;
 let session=[],index=0,mode='repeat',sessionId=0,results={},retryIds=new Set(),attempt=null,assisted=false,checked=false,active=false,token=0,timer=null;
 let autoplayQueue=[],autoplayPaused=false,autoplayCardComplete=false;
@@ -219,7 +219,7 @@ function applyLesson(){
  stop();
  const lesson=LESSONS.find(l=>l.id===selectedLesson),pool=lessonCards();
  $('lessonTitle').textContent=lesson?lesson.title:'Mixed revision';
- $('lessonDescription').textContent=lesson?lesson.description:'Practise phrases from all twelve lessons.';
+ $('lessonDescription').textContent=lesson?lesson.description:'Practise phrases from all fourteen lessons.';
  $('lessonNumber').textContent=lesson?String(LESSONS.indexOf(lesson)+1).padStart(2,'0'):'↻';
  $('preparationCount').textContent=pool.length+' phrases';
  const allOption=Array.from($('length').options||[]).find(o=>o.value==='all');
@@ -264,10 +264,10 @@ $('reveal').onclick=()=>{if(mode==='recall'&&!checked){state.records[session[ind
 $('settings').onclick=()=>{if(active&&mode==='autoplay')pauseAutoplay();stop();$('response').blur();$('settingsStatus').textContent='';refreshVoices();$('settingsDialog').showModal()};$('practiceSettings').onclick=()=>$('settings').click();$('done').onclick=()=>{stop();$('settingsDialog').close();focusAnswer()};
 $('refreshVoices').onclick=refreshVoices;$('previewEnglishVoice').onclick=()=>{stop();$('settingsStatus').textContent='Playing English sample…';speak('I have a reservation. What time is breakfast?','en',()=>{$('settingsStatus').textContent='English sample finished.'})};
 $('compareSpeed').onclick=()=>{stop();const t=token,rate=state.settings.rate==='1'?0.75:Number(state.settings.rate),c=CARDS.find(c=>c.id==='hotel-04');$('speedTestStatus').textContent='Normal (100%)…';speak(c.target,'ja-JP',()=>{timer=setTimeout(()=>{timer=null;if(t!==token)return;$('speedTestStatus').textContent='Slower ('+Math.round(rate*100)+'%)…';speak(c.target,'ja-JP',()=>{$('speedTestStatus').textContent='Comparison finished: 100%, then '+Math.round(rate*100)+'%.'},t,rate)},600)},t,1)};
-$('previewVoice').onclick=()=>{stop();$('settingsStatus').textContent='Playing voice sample…';speak(CARDS[0].spoken||CARDS[0].target,'ja-JP',()=>{$('settingsStatus').textContent='Sample finished.'})};
-for(const [id,key] of [['voice','voice'],['englishVoice','englishVoice'],['autoDim','autoDim'],['rate','rate'],['delay','delay'],['showRomaji','romaji'],['showScript','script']]){
+$('previewVoice').onclick=()=>{stop();$('settingsStatus').textContent='Playing voice sample…';speak(CARDS.find(c=>c.id==='hotel-04').target,'ja-JP',()=>{$('settingsStatus').textContent='Sample finished.'})};
+for(const [id,key] of [['voice','voice'],['englishVoice','englishVoice'],['rate','rate'],['delay','delay'],['showRomaji','romaji'],['showScript','script']]){
  const element=$(id);if(element.type==='checkbox')element.checked=state.settings[key];else if(id!=='voice')element.value=state.settings[key];
- element.onchange=()=>{state.settings[key]=element.type==='checkbox'?element.checked:element.value;save();renderPreparation();if(active&&!$('model').hidden)showModel();if(id==='rate'||id==='voice')$('previewVoice').click();if(id==='englishVoice'){refreshVoices();$('previewEnglishVoice').click()}if(id==='autoDim')Pocket.sync()};
+ element.onchange=()=>{state.settings[key]=element.type==='checkbox'?element.checked:element.value;save();renderPreparation();if(active&&!$('model').hidden)showModel();if(id==='rate'||id==='voice')$('previewVoice').click();if(id==='englishVoice'){refreshVoices();$('previewEnglishVoice').click()}};
 }
 function updateMode(){
  const selected=$('mode').value,isAutoplay=selected==='autoplay';
@@ -285,5 +285,5 @@ $('response').addEventListener('focus',viewport);
 window.visualViewport?.addEventListener('resize',viewport);window.visualViewport?.addEventListener('scroll',viewport);window.addEventListener('resize',viewport);
 if(synth)synth.onvoiceschanged=refreshVoices;
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(active&&mode==='autoplay'){if(!autoplayPaused)pauseAutoplay('Paused while away · tap Play to continue');return}stop();if(active)$('stage').textContent='Paused · tap Play to resume'}});
-const Pocket=createPocketLock({applicable:()=>active&&mode==='autoplay'&&!$('settingsDialog').open,eligible:()=>active&&mode==='autoplay'&&!autoplayPaused&&!document.hidden&&!$('settingsDialog').open,enabled:()=>state.settings.autoDim});
+const Pocket=createPocketLock({applicable:()=>active&&mode==='autoplay'&&!$('settingsDialog').open,eligible:()=>active&&mode==='autoplay'&&!autoplayPaused&&!document.hidden&&!$('settingsDialog').open});
 applyLesson();refreshVoices();updateMode();

@@ -1,6 +1,6 @@
 # Japanese audio cards
 
-Audio-first Japanese for travellers practice, with 101 phrases across twelve lessons from the supplied course handouts.
+Audio-first Japanese for travellers practice, with 146 cards across fourteen lessons from the supplied course handouts.
 
 ## Practice on iPhone
 
@@ -28,4 +28,6 @@ Autoplay uses the existing browser voices with the selected Japanese speed. It p
 
 Settings offer an English voice chooser and preview using the voices Safari exposes. Automatic selection prefers voices identified as Premium or Enhanced, then a browser default. An explicit choice is remembered. Accessibility’s selected voice is not necessarily exposed to web pages. Compare Japanese speeds plays the same phrase at 100% and then the chosen slower rate (75% when Normal is selected).
 
-During autoplay, **Dim & lock screen** covers the page and blocks its controls without stopping speech. It also activates after 30 seconds without interaction by default; disable automatic dimming in settings if preferred. Tap once to wake the shield, then separately tap **Unlock controls**. It dims the page rather than adjusting hardware brightness. A supported browser is asked to keep the screen awake during playback; this can be refused by the device. Keep Safari visible: OS lock and background playback are not supported.
+During autoplay, **Dim & lock screen** covers the page and blocks its controls without stopping speech. Dimming activates only when you tap its button. Tap once to wake the shield, then separately tap **Unlock controls**. It dims the page rather than adjusting hardware brightness. A supported browser is asked to keep the screen awake during playback; this can be refused by the device. Keep Safari visible: OS lock and background playback are not supported.
+
+The first two lessons teach basic numbers (0–19 and alternative readings) and building larger numbers through 12,345. Models use explicit kana for predictable pronunciation.

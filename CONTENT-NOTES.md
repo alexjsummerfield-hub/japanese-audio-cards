@@ -1,6 +1,6 @@
 # Course content notes
 
-101 phrase cards in 12 lessons, based on five supplied course PDFs. The original seven hotel IDs and models are retained. Every card has a source key, romaji, kana and contextual keyword glosses.
+146 cards in 14 lessons, based on five supplied course PDFs. The original seven hotel IDs and models are retained. Every card has a source key, romaji, kana and contextual keyword glosses.
 
 ## Sources
 
@@ -38,3 +38,9 @@ Primary references consulted for these clarifications:
 - [Japan Foundation Irodori vocabulary](https://www.irodori.jpf.go.jp/assets/data/wordlist_Z.pdf): gōsha as train car.
 - [Japan Foundation counters syllabus](https://www.jpf.go.jp/j/project/japanese/survey/area/country/syllabus/pdf/sy_honyaku_4china.pdf): sound changes and alternative floor readings.
 - [Tokyo Japanese learning material](https://www.spt.metro.tokyo.lg.jp/kyoiku/static/dbook/japanese/book.pdf): counting animals and bottles in context.
+
+## Basic counting supplement
+
+45 number cards precede the phrase and counter lessons: 24 basic cards including alternative readings of 0, 4, 7 and 9, followed by 21 cards demonstrating tens, hundreds, thousands, 10,000 and 12,345. These supplement the handout’s number chart. Each audio model uses kana so the intended reading is explicit; accepted answers include digits and appropriate alternative readings. Existing card IDs and history are preserved.
+
+Reading references: [Japan Foundation Marugoto numbers](https://words.marugotoweb.jp/static_contents/sp/collection/number.php?lang=en) and [Tokyo University of Foreign Studies number forms](https://www.coelang.tufs.ac.jp/ja/zt/gmod/contents/explanation/015.html). Preparation notes distinguish number variants from fixed combinations such as yo-ji, shichi-ji and ku-ji.
