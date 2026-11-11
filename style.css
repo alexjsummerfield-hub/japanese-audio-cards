@@ -52,3 +52,8 @@
 #pocketShield.awake{background:rgba(0,0,0,.94);color:#ddd}
 #pocketUnlock{min-height:60px;padding:12px 28px;background:#e6ece4;color:var(--ink);border:0;font-size:18px}
 body.pocket-locked{overflow:hidden}
+
+.lesson-audio{margin:20px 0;padding:18px;border:1px solid var(--line,#d9ded6);border-radius:16px;background:#eef2ea}
+.lesson-audio h3{font-size:19px;margin:0 0 8px}.lesson-audio p{line-height:1.5}
+.lesson-audio-actions{display:flex;gap:8px;flex-wrap:wrap}.lesson-audio-actions button{min-height:46px}
+.lesson-audio-current:empty{display:none}.lesson-audio-current{font-size:18px;margin-bottom:0}

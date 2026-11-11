@@ -435,7 +435,10 @@ const CARDS = [
         "ja": "ございます"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -454,7 +457,10 @@ const CARDS = [
         "ja": "こんにちは"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -473,7 +479,10 @@ const CARDS = [
         "ja": "こんばんは"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -494,7 +503,10 @@ const CARDS = [
         "ja": "さようなら"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -521,7 +533,10 @@ const CARDS = [
         "ja": "じゃまた"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -545,7 +560,10 @@ const CARDS = [
         "ja": "ございます"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -564,7 +582,10 @@ const CARDS = [
         "ja": "すみません"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -583,7 +604,10 @@ const CARDS = [
         "ja": "おねがいします"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -602,7 +626,10 @@ const CARDS = [
         "ja": "どうぞ"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -626,46 +653,71 @@ const CARDS = [
         "ja": "ですか"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
-    "id": "responses-01",
+    "id": "responses-yes-please",
     "lesson": "responses",
-    "prompt": "Yes.",
-    "target": "はい",
-    "kana": "はい",
-    "romaji": "Hai.",
-    "accepted": [],
+    "prompt": "Yes, please.",
+    "target": "はい、お願いします",
+    "kana": "はい、おねがいします",
+    "romaji": "Hai, onegai shimasu.",
+    "accepted": [
+      "はいお願いします",
+      "はいおねがいします"
+    ],
     "note": "",
     "keywords": [
       {
         "romaji": "hai",
         "meaning": "yes",
         "ja": "はい"
+      },
+      {
+        "romaji": "onegai shimasu",
+        "meaning": "please",
+        "ja": "おねがいします"
       }
     ],
-    "source": ["oct13", "travel"],
-    "example": ""
+    "source": [
+      "oct13",
+      "travel"
+    ],
+    "example": "An expanded reply for dictation practice."
   },
   {
-    "id": "responses-02",
+    "id": "responses-no-thanks",
     "lesson": "responses",
-    "prompt": "No.",
-    "target": "いいえ",
-    "kana": "いいえ",
-    "romaji": "Iie.",
-    "accepted": [],
+    "prompt": "No, I’m all right, thank you.",
+    "target": "いいえ、大丈夫です",
+    "kana": "いいえ、だいじょうぶです",
+    "romaji": "Iie, daijōbu desu.",
+    "accepted": [
+      "いいえ大丈夫です",
+      "いいえだいじょうぶです"
+    ],
     "note": "",
     "keywords": [
       {
         "romaji": "iie",
         "meaning": "no",
         "ja": "いいえ"
+      },
+      {
+        "romaji": "daijōbu desu",
+        "meaning": "I am all right; declining an offer here",
+        "ja": "だいじょうぶです"
       }
     ],
-    "source": ["oct13", "travel"],
-    "example": ""
+    "source": [
+      "oct13",
+      "travel"
+    ],
+    "example": "Politely declining an offer; an expanded reply for dictation practice."
   },
   {
     "id": "responses-03",
@@ -688,7 +740,10 @@ const CARDS = [
         "ja": "です"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -712,7 +767,10 @@ const CARDS = [
         "ja": "そうです"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -731,7 +789,10 @@ const CARDS = [
         "ja": "ちがいます"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": ""
   },
   {
@@ -760,7 +821,10 @@ const CARDS = [
         "ja": "ではありません"
       }
     ],
-    "source": ["oct13", "travel"],
+    "source": [
+      "oct13",
+      "travel"
+    ],
     "example": "The negative pattern uses Australian, already introduced in lesson 1."
   },
   {

@@ -4,7 +4,7 @@ LESSONS.unshift(...[
   {
     "id": "basic-numbers",
     "title": "Basic counting · 0 to 19",
-    "description": "Start with the sounds: zero to ten, alternative readings, then teens.",
+    "description": "Count in short groups, then practise alternative readings and the teens.",
     "sources": [
       "counters"
     ]
@@ -20,105 +20,118 @@ LESSONS.unshift(...[
 ]);
 CARDS.unshift(...[
   {
-    "id": "basic-numbers-01",
+    "id": "basic-counting-01",
     "lesson": "basic-numbers",
-    "prompt": "0",
-    "target": "ゼロ",
-    "kana": "ゼロ",
-    "spoken": "ゼロ",
-    "romaji": "Zero.",
+    "prompt": "0, 1, 2, 3",
+    "target": "ゼロ、いち、に、さん",
+    "kana": "ゼロ、いち、に、さん",
+    "spoken": "ゼロ、いち、に、さん",
+    "romaji": "Zero, ichi, ni, san.",
     "keywords": [
       {
         "romaji": "Zero",
         "meaning": "0",
         "ja": "ゼロ"
-      }
-    ],
-    "note": "Zero is a loanword; rei is another reading. Maru is used for zero in some labels.",
-    "accepted": [
-      "0",
-      "れい"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-02",
-    "lesson": "basic-numbers",
-    "prompt": "1",
-    "target": "一",
-    "kana": "いち",
-    "spoken": "いち",
-    "romaji": "Ichi.",
-    "keywords": [
+      },
       {
-        "romaji": "Ichi",
+        "romaji": "ichi",
         "meaning": "1",
         "ja": "いち"
-      }
-    ],
-    "note": "",
-    "accepted": [
-      "1"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-03",
-    "lesson": "basic-numbers",
-    "prompt": "2",
-    "target": "二",
-    "kana": "に",
-    "spoken": "に",
-    "romaji": "Ni.",
-    "keywords": [
+      },
       {
-        "romaji": "Ni",
+        "romaji": "ni",
         "meaning": "2",
         "ja": "に"
-      }
-    ],
-    "note": "",
-    "accepted": [
-      "2"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-04",
-    "lesson": "basic-numbers",
-    "prompt": "3",
-    "target": "三",
-    "kana": "さん",
-    "spoken": "さん",
-    "romaji": "San.",
-    "keywords": [
+      },
       {
-        "romaji": "San",
+        "romaji": "san",
         "meaning": "3",
         "ja": "さん"
       }
     ],
-    "note": "",
+    "note": "Say the whole sequence in one dictation. Zero is a loanword; the later version uses rei.",
     "accepted": [
-      "3"
+      "0、1、2、3",
+      "0、1、2、三",
+      "0、1、2、さん",
+      "0、1、二、3",
+      "0、1、二、三",
+      "0、1、二、さん",
+      "0、1、に、3",
+      "0、1、に、三",
+      "0、1、に、さん",
+      "0、一、2、3",
+      "0、一、2、三",
+      "0、一、2、さん",
+      "0、一、二、3",
+      "0、一、二、三",
+      "0、一、二、さん",
+      "0、一、に、3",
+      "0、一、に、三",
+      "0、一、に、さん",
+      "0、いち、2、3",
+      "0、いち、2、三",
+      "0、いち、2、さん",
+      "0、いち、二、3",
+      "0、いち、二、三",
+      "0、いち、二、さん",
+      "0、いち、に、3",
+      "0、いち、に、三",
+      "0、いち、に、さん",
+      "零、1、2、3",
+      "零、1、2、三",
+      "零、1、2、さん",
+      "零、1、二、3",
+      "零、1、二、三",
+      "零、1、二、さん",
+      "零、1、に、3",
+      "零、1、に、三",
+      "零、1、に、さん",
+      "零、一、2、3",
+      "零、一、2、三",
+      "零、一、2、さん",
+      "零、一、二、3",
+      "零、一、二、三",
+      "零、一、二、さん",
+      "零、一、に、3",
+      "零、一、に、三",
+      "零、一、に、さん",
+      "零、いち、2、3",
+      "零、いち、2、三",
+      "零、いち、2、さん",
+      "零、いち、二、3",
+      "零、いち、二、三",
+      "零、いち、二、さん",
+      "零、いち、に、3",
+      "零、いち、に、三",
+      "零、いち、に、さん",
+      "ゼロ、1、2、3",
+      "ゼロ、1、2、三",
+      "ゼロ、1、2、さん",
+      "ゼロ、1、二、3",
+      "ゼロ、1、二、三",
+      "ゼロ、1、二、さん",
+      "ゼロ、1、に、3",
+      "ゼロ、1、に、三",
+      "ゼロ、1、に、さん",
+      "ゼロ、一、2、3",
+      "ゼロ、一、2、三",
+      "ゼロ、一、2、さん",
+      "ゼロ、一、二、3",
+      "ゼロ、一、二、三",
+      "ゼロ、一、二、さん",
+      "ゼロ、一、に、3",
+      "ゼロ、一、に、三",
+      "ゼロ、一、に、さん",
+      "ゼロ、いち、2、3",
+      "ゼロ、いち、2、三",
+      "ゼロ、いち、2、さん",
+      "ゼロ、いち、二、3",
+      "ゼロ、いち、二、三",
+      "ゼロ、いち、二、さん",
+      "ゼロ、いち、に、3",
+      "ゼロ、いち、に、三",
+      "ゼロ、いち、に、さん"
     ],
     "source": "counters",
     "example": "",
@@ -126,81 +139,62 @@ CARDS.unshift(...[
     "targets": [
       "basic-numbers"
     ],
-    "type": "number"
+    "type": "number-sequence"
   },
   {
-    "id": "basic-numbers-05",
+    "id": "basic-counting-02",
     "lesson": "basic-numbers",
-    "prompt": "4",
-    "target": "四",
-    "kana": "よん",
-    "spoken": "よん",
-    "romaji": "Yon.",
+    "prompt": "4, 5, 6",
+    "target": "よん、ご、ろく",
+    "kana": "よん、ご、ろく",
+    "spoken": "よん、ご、ろく",
+    "romaji": "Yon, go, roku.",
     "keywords": [
       {
         "romaji": "Yon",
         "meaning": "4",
         "ja": "よん"
-      }
-    ],
-    "note": "Yon is a useful everyday reading. Shi is another reading of 4; practise it on the alternative-reading card.",
-    "accepted": [
-      "4",
-      "し"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-06",
-    "lesson": "basic-numbers",
-    "prompt": "5",
-    "target": "五",
-    "kana": "ご",
-    "spoken": "ご",
-    "romaji": "Go.",
-    "keywords": [
+      },
       {
-        "romaji": "Go",
+        "romaji": "go",
         "meaning": "5",
         "ja": "ご"
-      }
-    ],
-    "note": "",
-    "accepted": [
-      "5"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-07",
-    "lesson": "basic-numbers",
-    "prompt": "6",
-    "target": "六",
-    "kana": "ろく",
-    "spoken": "ろく",
-    "romaji": "Roku.",
-    "keywords": [
+      },
       {
-        "romaji": "Roku",
+        "romaji": "roku",
         "meaning": "6",
         "ja": "ろく"
       }
     ],
-    "note": "",
+    "note": "Practise the whole group, using yon for four.",
     "accepted": [
-      "6"
+      "4、5、6",
+      "4、5、六",
+      "4、5、ろく",
+      "4、五、6",
+      "4、五、六",
+      "4、五、ろく",
+      "4、ご、6",
+      "4、ご、六",
+      "4、ご、ろく",
+      "四、5、6",
+      "四、5、六",
+      "四、5、ろく",
+      "四、五、6",
+      "四、五、六",
+      "四、五、ろく",
+      "四、ご、6",
+      "四、ご、六",
+      "四、ご、ろく",
+      "よん、5、6",
+      "よん、5、六",
+      "よん、5、ろく",
+      "よん、五、6",
+      "よん、五、六",
+      "よん、五、ろく",
+      "よん、ご、6",
+      "よん、ご、六",
+      "よん、ご、ろく"
     ],
     "source": "counters",
     "example": "",
@@ -208,109 +202,121 @@ CARDS.unshift(...[
     "targets": [
       "basic-numbers"
     ],
-    "type": "number"
+    "type": "number-sequence"
   },
   {
-    "id": "basic-numbers-08",
+    "id": "basic-counting-03",
     "lesson": "basic-numbers",
-    "prompt": "7",
-    "target": "七",
-    "kana": "なな",
-    "spoken": "なな",
-    "romaji": "Nana.",
+    "prompt": "7, 8, 9, 10",
+    "target": "なな、はち、きゅう、じゅう",
+    "kana": "なな、はち、きゅう、じゅう",
+    "spoken": "なな、はち、きゅう、じゅう",
+    "romaji": "Nana, hachi, kyū, jū.",
     "keywords": [
       {
         "romaji": "Nana",
         "meaning": "7",
         "ja": "なな"
-      }
-    ],
-    "note": "Nana and shichi both mean 7. This model uses nana.",
-    "accepted": [
-      "7",
-      "しち"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-09",
-    "lesson": "basic-numbers",
-    "prompt": "8",
-    "target": "八",
-    "kana": "はち",
-    "spoken": "はち",
-    "romaji": "Hachi.",
-    "keywords": [
+      },
       {
-        "romaji": "Hachi",
+        "romaji": "hachi",
         "meaning": "8",
         "ja": "はち"
-      }
-    ],
-    "note": "",
-    "accepted": [
-      "8"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-10",
-    "lesson": "basic-numbers",
-    "prompt": "9",
-    "target": "九",
-    "kana": "きゅう",
-    "spoken": "きゅう",
-    "romaji": "Kyū.",
-    "keywords": [
+      },
       {
-        "romaji": "Kyū",
+        "romaji": "kyū",
         "meaning": "9",
         "ja": "きゅう"
-      }
-    ],
-    "note": "Kyū and ku both mean 9. Hold the ū in kyū longer.",
-    "accepted": [
-      "9",
-      "く"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-11",
-    "lesson": "basic-numbers",
-    "prompt": "10",
-    "target": "十",
-    "kana": "じゅう",
-    "spoken": "じゅう",
-    "romaji": "Jū.",
-    "keywords": [
+      },
       {
-        "romaji": "Jū",
+        "romaji": "jū",
         "meaning": "10",
         "ja": "じゅう"
       }
     ],
-    "note": "",
+    "note": "Practise the whole group, using nana and kyū. Hold the long vowels in kyū and jū.",
     "accepted": [
-      "10"
+      "7、8、9、10",
+      "7、8、9、十",
+      "7、8、9、じゅう",
+      "7、8、九、10",
+      "7、8、九、十",
+      "7、8、九、じゅう",
+      "7、8、きゅう、10",
+      "7、8、きゅう、十",
+      "7、8、きゅう、じゅう",
+      "7、八、9、10",
+      "7、八、9、十",
+      "7、八、9、じゅう",
+      "7、八、九、10",
+      "7、八、九、十",
+      "7、八、九、じゅう",
+      "7、八、きゅう、10",
+      "7、八、きゅう、十",
+      "7、八、きゅう、じゅう",
+      "7、はち、9、10",
+      "7、はち、9、十",
+      "7、はち、9、じゅう",
+      "7、はち、九、10",
+      "7、はち、九、十",
+      "7、はち、九、じゅう",
+      "7、はち、きゅう、10",
+      "7、はち、きゅう、十",
+      "7、はち、きゅう、じゅう",
+      "七、8、9、10",
+      "七、8、9、十",
+      "七、8、9、じゅう",
+      "七、8、九、10",
+      "七、8、九、十",
+      "七、8、九、じゅう",
+      "七、8、きゅう、10",
+      "七、8、きゅう、十",
+      "七、8、きゅう、じゅう",
+      "七、八、9、10",
+      "七、八、9、十",
+      "七、八、9、じゅう",
+      "七、八、九、10",
+      "七、八、九、十",
+      "七、八、九、じゅう",
+      "七、八、きゅう、10",
+      "七、八、きゅう、十",
+      "七、八、きゅう、じゅう",
+      "七、はち、9、10",
+      "七、はち、9、十",
+      "七、はち、9、じゅう",
+      "七、はち、九、10",
+      "七、はち、九、十",
+      "七、はち、九、じゅう",
+      "七、はち、きゅう、10",
+      "七、はち、きゅう、十",
+      "七、はち、きゅう、じゅう",
+      "なな、8、9、10",
+      "なな、8、9、十",
+      "なな、8、9、じゅう",
+      "なな、8、九、10",
+      "なな、8、九、十",
+      "なな、8、九、じゅう",
+      "なな、8、きゅう、10",
+      "なな、8、きゅう、十",
+      "なな、8、きゅう、じゅう",
+      "なな、八、9、10",
+      "なな、八、9、十",
+      "なな、八、9、じゅう",
+      "なな、八、九、10",
+      "なな、八、九、十",
+      "なな、八、九、じゅう",
+      "なな、八、きゅう、10",
+      "なな、八、きゅう、十",
+      "なな、八、きゅう、じゅう",
+      "なな、はち、9、10",
+      "なな、はち、9、十",
+      "なな、はち、9、じゅう",
+      "なな、はち、九、10",
+      "なな、はち、九、十",
+      "なな、はち、九、じゅう",
+      "なな、はち、きゅう、10",
+      "なな、はち、きゅう、十",
+      "なな、はち、きゅう、じゅう"
     ],
     "source": "counters",
     "example": "",
@@ -318,27 +324,121 @@ CARDS.unshift(...[
     "targets": [
       "basic-numbers"
     ],
-    "type": "number"
+    "type": "number-sequence"
   },
   {
-    "id": "basic-numbers-12",
+    "id": "basic-counting-rei",
     "lesson": "basic-numbers",
-    "prompt": "0 (Japanese reading)",
-    "target": "零",
-    "kana": "れい",
-    "spoken": "れい",
-    "romaji": "Rei.",
+    "prompt": "0, 1, 2, 3",
+    "target": "れい、いち、に、さん",
+    "kana": "れい、いち、に、さん",
+    "spoken": "れい、いち、に、さん",
+    "romaji": "Rei, ichi, ni, san.",
     "keywords": [
       {
         "romaji": "Rei",
-        "meaning": "0 (Japanese reading)",
+        "meaning": "0",
         "ja": "れい"
+      },
+      {
+        "romaji": "ichi",
+        "meaning": "1",
+        "ja": "いち"
+      },
+      {
+        "romaji": "ni",
+        "meaning": "2",
+        "ja": "に"
+      },
+      {
+        "romaji": "san",
+        "meaning": "3",
+        "ja": "さん"
       }
     ],
-    "note": "Practise rei, another way to say zero. Maru is used in labels such as room 203.",
+    "note": "Alternative zero reading: practise rei at the start of this sequence.",
     "accepted": [
-      "0",
-      "ゼロ"
+      "0、1、2、3",
+      "0、1、2、三",
+      "0、1、2、さん",
+      "0、1、二、3",
+      "0、1、二、三",
+      "0、1、二、さん",
+      "0、1、に、3",
+      "0、1、に、三",
+      "0、1、に、さん",
+      "0、一、2、3",
+      "0、一、2、三",
+      "0、一、2、さん",
+      "0、一、二、3",
+      "0、一、二、三",
+      "0、一、二、さん",
+      "0、一、に、3",
+      "0、一、に、三",
+      "0、一、に、さん",
+      "0、いち、2、3",
+      "0、いち、2、三",
+      "0、いち、2、さん",
+      "0、いち、二、3",
+      "0、いち、二、三",
+      "0、いち、二、さん",
+      "0、いち、に、3",
+      "0、いち、に、三",
+      "0、いち、に、さん",
+      "零、1、2、3",
+      "零、1、2、三",
+      "零、1、2、さん",
+      "零、1、二、3",
+      "零、1、二、三",
+      "零、1、二、さん",
+      "零、1、に、3",
+      "零、1、に、三",
+      "零、1、に、さん",
+      "零、一、2、3",
+      "零、一、2、三",
+      "零、一、2、さん",
+      "零、一、二、3",
+      "零、一、二、三",
+      "零、一、二、さん",
+      "零、一、に、3",
+      "零、一、に、三",
+      "零、一、に、さん",
+      "零、いち、2、3",
+      "零、いち、2、三",
+      "零、いち、2、さん",
+      "零、いち、二、3",
+      "零、いち、二、三",
+      "零、いち、二、さん",
+      "零、いち、に、3",
+      "零、いち、に、三",
+      "零、いち、に、さん",
+      "れい、1、2、3",
+      "れい、1、2、三",
+      "れい、1、2、さん",
+      "れい、1、二、3",
+      "れい、1、二、三",
+      "れい、1、二、さん",
+      "れい、1、に、3",
+      "れい、1、に、三",
+      "れい、1、に、さん",
+      "れい、一、2、3",
+      "れい、一、2、三",
+      "れい、一、2、さん",
+      "れい、一、二、3",
+      "れい、一、二、三",
+      "れい、一、二、さん",
+      "れい、一、に、3",
+      "れい、一、に、三",
+      "れい、一、に、さん",
+      "れい、いち、2、3",
+      "れい、いち、2、三",
+      "れい、いち、2、さん",
+      "れい、いち、二、3",
+      "れい、いち、二、三",
+      "れい、いち、二、さん",
+      "れい、いち、に、3",
+      "れい、いち、に、三",
+      "れい、いち、に、さん"
     ],
     "source": "counters",
     "example": "",
@@ -346,27 +446,62 @@ CARDS.unshift(...[
     "targets": [
       "basic-numbers"
     ],
-    "type": "number"
+    "type": "number-sequence"
   },
   {
-    "id": "basic-numbers-13",
+    "id": "basic-counting-shi",
     "lesson": "basic-numbers",
-    "prompt": "4 (alternative reading)",
-    "target": "四",
-    "kana": "し",
-    "spoken": "し",
-    "romaji": "Shi.",
+    "prompt": "4, 5, 6",
+    "target": "し、ご、ろく",
+    "kana": "し、ご、ろく",
+    "spoken": "し、ご、ろく",
+    "romaji": "Shi, go, roku.",
     "keywords": [
       {
         "romaji": "Shi",
-        "meaning": "4 (alternative reading)",
+        "meaning": "4",
         "ja": "し"
+      },
+      {
+        "romaji": "go",
+        "meaning": "5",
+        "ja": "ご"
+      },
+      {
+        "romaji": "roku",
+        "meaning": "6",
+        "ja": "ろく"
       }
     ],
-    "note": "Practise shi here. For four o’clock use yo-ji; April is shi-gatsu. Readings depend on the word that follows.",
+    "note": "Alternative four reading: practise shi. Four o’clock is yo-ji, while April is shi-gatsu; the word that follows matters.",
     "accepted": [
-      "4",
-      "よん"
+      "4、5、6",
+      "4、5、六",
+      "4、5、ろく",
+      "4、五、6",
+      "4、五、六",
+      "4、五、ろく",
+      "4、ご、6",
+      "4、ご、六",
+      "4、ご、ろく",
+      "四、5、6",
+      "四、5、六",
+      "四、5、ろく",
+      "四、五、6",
+      "四、五、六",
+      "四、五、ろく",
+      "四、ご、6",
+      "四、ご、六",
+      "四、ご、ろく",
+      "し、5、6",
+      "し、5、六",
+      "し、5、ろく",
+      "し、五、6",
+      "し、五、六",
+      "し、五、ろく",
+      "し、ご、6",
+      "し、ご、六",
+      "し、ご、ろく"
     ],
     "source": "counters",
     "example": "",
@@ -374,55 +509,121 @@ CARDS.unshift(...[
     "targets": [
       "basic-numbers"
     ],
-    "type": "number"
+    "type": "number-sequence"
   },
   {
-    "id": "basic-numbers-14",
+    "id": "basic-counting-shichi-ku",
     "lesson": "basic-numbers",
-    "prompt": "7 (alternative reading)",
-    "target": "七",
-    "kana": "しち",
-    "spoken": "しち",
-    "romaji": "Shichi.",
+    "prompt": "7, 8, 9, 10",
+    "target": "しち、はち、く、じゅう",
+    "kana": "しち、はち、く、じゅう",
+    "spoken": "しち、はち、く、じゅう",
+    "romaji": "Shichi, hachi, ku, jū.",
     "keywords": [
       {
         "romaji": "Shichi",
-        "meaning": "7 (alternative reading)",
+        "meaning": "7",
         "ja": "しち"
-      }
-    ],
-    "note": "Practise shichi here. Seven o’clock is shichi-ji; nana is common in other counting contexts.",
-    "accepted": [
-      "7",
-      "なな"
-    ],
-    "source": "counters",
-    "example": "",
-    "grammar": [],
-    "targets": [
-      "basic-numbers"
-    ],
-    "type": "number"
-  },
-  {
-    "id": "basic-numbers-15",
-    "lesson": "basic-numbers",
-    "prompt": "9 (alternative reading)",
-    "target": "九",
-    "kana": "く",
-    "spoken": "く",
-    "romaji": "Ku.",
-    "keywords": [
+      },
       {
-        "romaji": "Ku",
-        "meaning": "9 (alternative reading)",
+        "romaji": "hachi",
+        "meaning": "8",
+        "ja": "はち"
+      },
+      {
+        "romaji": "ku",
+        "meaning": "9",
         "ja": "く"
+      },
+      {
+        "romaji": "jū",
+        "meaning": "10",
+        "ja": "じゅう"
       }
     ],
-    "note": "Practise ku here. Nine o’clock is ku-ji; 90 is kyū-jū. Do not substitute ku everywhere.",
+    "note": "Alternative readings: practise shichi and ku in the sequence. Seven o’clock is shichi-ji and nine o’clock is ku-ji.",
     "accepted": [
-      "9",
-      "きゅう"
+      "7、8、9、10",
+      "7、8、9、十",
+      "7、8、9、じゅう",
+      "7、8、九、10",
+      "7、8、九、十",
+      "7、8、九、じゅう",
+      "7、8、く、10",
+      "7、8、く、十",
+      "7、8、く、じゅう",
+      "7、八、9、10",
+      "7、八、9、十",
+      "7、八、9、じゅう",
+      "7、八、九、10",
+      "7、八、九、十",
+      "7、八、九、じゅう",
+      "7、八、く、10",
+      "7、八、く、十",
+      "7、八、く、じゅう",
+      "7、はち、9、10",
+      "7、はち、9、十",
+      "7、はち、9、じゅう",
+      "7、はち、九、10",
+      "7、はち、九、十",
+      "7、はち、九、じゅう",
+      "7、はち、く、10",
+      "7、はち、く、十",
+      "7、はち、く、じゅう",
+      "七、8、9、10",
+      "七、8、9、十",
+      "七、8、9、じゅう",
+      "七、8、九、10",
+      "七、8、九、十",
+      "七、8、九、じゅう",
+      "七、8、く、10",
+      "七、8、く、十",
+      "七、8、く、じゅう",
+      "七、八、9、10",
+      "七、八、9、十",
+      "七、八、9、じゅう",
+      "七、八、九、10",
+      "七、八、九、十",
+      "七、八、九、じゅう",
+      "七、八、く、10",
+      "七、八、く、十",
+      "七、八、く、じゅう",
+      "七、はち、9、10",
+      "七、はち、9、十",
+      "七、はち、9、じゅう",
+      "七、はち、九、10",
+      "七、はち、九、十",
+      "七、はち、九、じゅう",
+      "七、はち、く、10",
+      "七、はち、く、十",
+      "七、はち、く、じゅう",
+      "しち、8、9、10",
+      "しち、8、9、十",
+      "しち、8、9、じゅう",
+      "しち、8、九、10",
+      "しち、8、九、十",
+      "しち、8、九、じゅう",
+      "しち、8、く、10",
+      "しち、8、く、十",
+      "しち、8、く、じゅう",
+      "しち、八、9、10",
+      "しち、八、9、十",
+      "しち、八、9、じゅう",
+      "しち、八、九、10",
+      "しち、八、九、十",
+      "しち、八、九、じゅう",
+      "しち、八、く、10",
+      "しち、八、く、十",
+      "しち、八、く、じゅう",
+      "しち、はち、9、10",
+      "しち、はち、9、十",
+      "しち、はち、9、じゅう",
+      "しち、はち、九、10",
+      "しち、はち、九、十",
+      "しち、はち、九、じゅう",
+      "しち、はち、く、10",
+      "しち、はち、く、十",
+      "しち、はち、く、じゅう"
     ],
     "source": "counters",
     "example": "",
@@ -430,7 +631,7 @@ CARDS.unshift(...[
     "targets": [
       "basic-numbers"
     ],
-    "type": "number"
+    "type": "number-sequence"
   },
   {
     "id": "basic-numbers-16",
@@ -1258,7 +1459,7 @@ Object.assign(COUNTER_GUIDES,{
   "basic-numbers": [
     [
       "Learn the sound first",
-      "Start with 0–10. The next four cards practise alternative readings separately: zero / rei, yon / shi, nana / shichi, kyū / ku. Both readings can represent the same number; the word or counter after it determines which form fits."
+      "Count in groups: 0, 1, 2, 3; then 4, 5, 6; then 7, 8, 9, 10. Later groups use alternative readings: zero / rei, yon / shi, nana / shichi, kyū / ku. Say the whole group in one dictation. Both readings can represent the same number; the word or counter after it determines which form fits."
     ],
     [
       "4, 7 and 9 in context",

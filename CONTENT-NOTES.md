@@ -1,6 +1,6 @@
 # Course content notes
 
-146 cards in 14 lessons, based on five supplied course PDFs. The original seven hotel IDs and models are retained. Every card has a source key, romaji, kana and contextual keyword glosses.
+137 cards in 14 lessons, based on five supplied course PDFs. The original seven hotel IDs and models are retained. Every card has a source key, romaji, kana and contextual keyword glosses.
 
 ## Sources
 
@@ -29,7 +29,7 @@ Repeated phrases are merged, including the two price questions. The emergency-nu
 
 ## Counters supplement
 
-42 new contextual cards cover amounts and labels, objects and drinks, people and animals, and dates/durations/frequency. The handout provides the counter categories and number patterns; the complete example sentences, keyword glosses and preparation explanations are added teaching material. Room 203 uses ni maru san gōshitsu, with ni hyaku san accepted. Spoken kana avoids a synthesizer guessing numeral readings. Existing 59 cards and hotel IDs are unchanged.
+42 new contextual cards cover amounts and labels, objects and drinks, people and animals, and dates/durations/frequency. The handout provides the counter categories and number patterns; the complete example sentences, keyword glosses and preparation explanations are added teaching material. Room 203 uses ni maru san gōshitsu, with ni hyaku san accepted. Spoken kana avoids a synthesizer guessing numeral readings. All hotel IDs are unchanged. Two short responses are expanded in the later dictation revision below.
 
 The transport explanation distinguishes gōsha (a train carriage) from ban (a bus route or other label), clarifying the handout’s broader train/bus description. Floor three models sangai and accepts sankai. Ko and tsu overlap for some objects; these examples specify the form being practised. Date forms are distinguished from durations, especially tsuitachi versus ichinichi and futsuka versus futsuka-kan. These are introductory examples, not an exhaustive counter reference.
 
@@ -41,6 +41,12 @@ Primary references consulted for these clarifications:
 
 ## Basic counting supplement
 
-45 number cards precede the phrase and counter lessons: 24 basic cards including alternative readings of 0, 4, 7 and 9, followed by 21 cards demonstrating tens, hundreds, thousands, 10,000 and 12,345. These supplement the handout’s number chart. Each audio model uses kana so the intended reading is explicit; accepted answers include digits and appropriate alternative readings. Existing card IDs and history are preserved.
+36 number cards precede the phrase and counter lessons: 15 basic cards including grouped sequences and alternative readings of 0, 4, 7 and 9, followed by 21 cards demonstrating tens, hundreds, thousands, 10,000 and 12,345. These supplement the handout’s number chart. Each audio model uses kana so the intended reading is explicit; accepted answers include digits and appropriate alternative readings. Existing hotel and phrase history is preserved; replaced counting and response cards use new IDs as described below.
 
 Reading references: [Japan Foundation Marugoto numbers](https://words.marugotoweb.jp/static_contents/sp/collection/number.php?lang=en) and [Tokyo University of Foreign Studies number forms](https://www.coelang.tufs.ac.jp/ja/zt/gmod/contents/explanation/015.html). Preparation notes distinguish number variants from fixed combinations such as yo-ji, shichi-ji and ku-ji.
+
+## Audio introduction and dictation revision
+
+The six introductory number/counter lessons now have authored bilingual listening scripts in lesson-audio.js. Every segment declares its speech language and has display text. Japanese models are kana, with romaji displayed; English narration contains no Japanese examples for the English synthesizer to pronounce. The scripts explain existing examples rather than introducing a new course syllabus.
+
+Basic 0–10 cards are replaced by three counting groups and three alternative-reading groups. Each group contains at least three numbers, allowing dictation to hear a sequence rather than a single short sound. The nine teen cards and larger-number cards remain individual. New grouped IDs leave old single-number history untouched. The two bare yes/no cards become complete short replies with new IDs. Other short functional phrases, such as greetings and polite thanks, remain natural complete utterances.

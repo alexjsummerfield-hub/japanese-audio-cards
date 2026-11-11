@@ -3,24 +3,28 @@ const $=id=>document.getElementById(id), STORAGE='japanese-travel-pilot-v1';
 let state={records:{},repetition:{},sessionNumber:0,settings:{voice:'auto',englishVoice:'auto',rate:'1',delay:'1500',romaji:true,script:false}};
 let storageOK=true;
 try{const saved=JSON.parse(localStorage.getItem(STORAGE)||'null');if(saved)state={...state,...saved,settings:{...state.settings,...saved.settings}}}catch{storageOK=false}
+// Apply the requested Australian default once; later explicit voice choices stay remembered.
+if(state.settings.englishDefaultVersion!==1){state.settings.englishVoice='device';state.settings.englishLocale='en-AU';state.settings.englishDefaultVersion=1}
 // Keep the existing Slower preference when upgrading from the earlier 80% setting.
 if(state.settings.rate==='0.8')state.settings.rate='0.75';
 if(!['1','0.75','0.6'].includes(state.settings.rate))state.settings.rate='1';
 let selectedLesson=LESSONS.some(l=>l.id===state.settings.lesson)?state.settings.lesson:'basic-numbers';
 const synth=window.speechSynthesis;
 let session=[],index=0,mode='repeat',sessionId=0,results={},retryIds=new Set(),attempt=null,assisted=false,checked=false,active=false,token=0,timer=null;
+let narrationPlaying=false,narrationIndex=0,narrationLesson=null;
 let autoplayQueue=[],autoplayPaused=false,autoplayCardComplete=false;
 function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));storageOK=true}catch{storageOK=false}updateSummary()}
 function lessonCards(){return selectedLesson==='all'?CARDS:CARDS.filter(c=>c.lesson===selectedLesson)}
 function updateSummary(){const due=lessonCards().filter(c=>Learning.isDue(state.records[c.id],Date.now())).length;$('reviewSummary').textContent=storageOK?(due?`${due} phrase${due===1?' is':'s are'} ready for recall review. `:'')+'Progress stays on this device.':'Storage unavailable: progress lasts only in this tab.'}
-function stop(){token++;clearTimeout(timer);timer=null;synth?.cancel()}
+function stop(){if(narrationPlaying){narrationPlaying=false;updateNarrationControls('Paused · Resume repeats this section.')}token++;clearTimeout(timer);timer=null;synth?.cancel()}
 function voiceQuality(v){return /premium/i.test(v.name+' '+v.voiceURI)?2:/enhanced/i.test(v.name+' '+v.voiceURI)?1:0}
 function englishVoices(){return synth?synth.getVoices().filter(v=>/^en(?:-|$)/i.test(v.lang)):[]}
 function selectedEnglishVoice(){
  const voices=englishVoices();
  if(state.settings.englishVoice==='device')return null;
  if(state.settings.englishVoice!=='auto')return voices.find(v=>voiceKey(v)===state.settings.englishVoice)||null;
- return [...voices].sort((a,b)=>voiceQuality(b)-voiceQuality(a)||Number(!!b.default)-Number(!!a.default))[0]||null;
+ const australian=voices.filter(v=>/^en[-_]AU$/i.test(v.lang));
+ return australian.sort((a,b)=>Number(!!b.default)-Number(!!a.default)||voiceQuality(b)-voiceQuality(a))[0]||null;
 }
 function japaneseVoices(){return synth?synth.getVoices().filter(v=>/^ja(?:-|$)/i.test(v.lang)):[]}
 function voiceKey(v){return JSON.stringify([v.voiceURI,v.name,v.lang,v.localService])}
@@ -29,23 +33,22 @@ function refreshVoices(){
  const names=voices.map(v=>v.name);
  voices.forEach(v=>$('voice').add(new Option(v.name+(names.filter(n=>n===v.name).length>1?' · '+v.voiceURI+' · '+(v.localService?'on device':'network'):''),voiceKey(v))));
  $('voice').value=voices.some(v=>voiceKey(v)===state.settings.voice)?state.settings.voice:'auto';
- const english=englishVoices();$('englishVoice').replaceChildren(new Option('Automatic · prefer enhanced voices','auto'),new Option('Browser default','device'));
+ const english=englishVoices();$('englishVoice').replaceChildren(new Option('Automatic · Australian English','auto'),new Option('Australian English · system default','device'));
  for(const v of english){const quality=voiceQuality(v);$('englishVoice').add(new Option(v.name+' · '+v.lang+(quality?' · '+(quality===2?'Premium':'Enhanced'):'')+(english.filter(x=>x.name===v.name&&x.lang===v.lang).length>1?' · '+v.voiceURI:''),voiceKey(v)))}
  $('englishVoice').value=['auto','device'].includes(state.settings.englishVoice)||english.some(v=>voiceKey(v)===state.settings.englishVoice)?state.settings.englishVoice:'auto';
- const selected=selectedEnglishVoice();$('englishVoiceInfo').textContent=english.length+' English voices exposed by this browser.'+(selected?' Selected: '+selected.name+'.':' Using the browser default.')+' Preview a voice to choose; downloaded Accessibility voices may not appear here.';
+ const selected=selectedEnglishVoice();$('englishVoiceInfo').textContent=english.length+' English voices exposed by this browser.'+(selected?' Selected: '+selected.name+'.':' Requesting the system’s Australian English default.')+' Preview a voice to choose; downloaded Accessibility voices may not appear here.';
  $('voiceInfo').textContent=!synth?'Speech playback is unavailable in this browser.':voices.length?`${voices.length} Japanese voice${voices.length===1?'':'s'} available. Preview to choose.`:'No Japanese voice is listed yet. Try Refresh voices; playback will request the device’s Japanese default.';
 }
 function speak(text,lang,done=()=>{},t=token,rateOverride){
  if(t!==token)return;
  if(!synth){audioFailure('Speech playback is unavailable in this browser.');return}
- const utterance=new SpeechSynthesisUtterance(text);utterance.lang=lang;
- const vs=synth.getVoices();
+ const utterance=new SpeechSynthesisUtterance(text);utterance.lang=lang==='ja-JP'?'ja-JP':'en-AU';
  const chosen=lang==='ja-JP'?japaneseVoices().find(v=>voiceKey(v)===state.settings.voice):selectedEnglishVoice();
- if(chosen)utterance.voice=chosen;utterance.rate=lang==='ja-JP'?Number(rateOverride??state.settings.rate):1;
+ if(chosen){utterance.voice=chosen;utterance.lang=chosen.lang}utterance.rate=lang==='ja-JP'?Number(rateOverride??state.settings.rate):1;
  utterance.onend=()=>{if(t===token)done()};utterance.onerror=()=>{if(t===token)audioFailure('Audio could not play. Tap Play to retry, or choose another voice in settings.')};
  synth.speak(utterance);
 }
-function audioFailure(message){if(active&&mode==='autoplay'){pauseAutoplay();$('notice').textContent=message;return}$('notice').textContent=message;$('settingsStatus').textContent=message;$('stage').textContent='Audio unavailable · you can retry';$('response').disabled=false;$('check').disabled=false}
+function audioFailure(message){if(narrationPlaying){stop();$('lessonAudioStatus').textContent=message;return}if(active&&mode==='autoplay'){pauseAutoplay();$('notice').textContent=message;return}$('notice').textContent=message;$('settingsStatus').textContent=message;$('stage').textContent='Audio unavailable · you can retry';$('response').disabled=false;$('check').disabled=false}
 function focusAnswer(){
  if(!active||mode==='autoplay'||checked||$('settingsDialog').open)return;
  const field=$('response');
@@ -224,7 +227,7 @@ function applyLesson(){
  $('preparationCount').textContent=pool.length+' phrases';
  const allOption=Array.from($('length').options||[]).find(o=>o.value==='all');
  if(allOption)allOption.textContent='All '+pool.length+' phrases';
- state.settings.lesson=selectedLesson;save();renderGuide();renderPreparation();
+ state.settings.lesson=selectedLesson;save();renderGuide();renderLessonAudio();renderPreparation();
 }
 function renderGuide(){
  const box=$('lessonGuide');box.replaceChildren();
@@ -232,6 +235,41 @@ function renderGuide(){
  for(const [title,text] of sections){const section=document.createElement('section');section.className='counter-explanation';const heading=document.createElement('h3');heading.textContent=title;const p=document.createElement('p');p.textContent=text;section.append(heading,p);box.append(section)}
  if(sections.length){const sources=document.createElement('p');sources.className='guide-note';sources.textContent='Based on the class counters handout, with contextual examples and reading notes. Start with this lesson’s examples; no script reading is required.';box.append(sources)}
 }
+function updateNarrationControls(message){
+ const parts=LESSON_AUDIO[selectedLesson]||[];
+ $('lessonListen').textContent=narrationPlaying?'Ⅱ Pause':narrationLesson===selectedLesson&&narrationIndex<parts.length?'▶ Resume':'▶ Listen to lesson';
+ $('lessonListen').setAttribute('aria-pressed',String(narrationPlaying));
+ $('lessonRestart').hidden=narrationLesson!==selectedLesson;
+ if(message)$('lessonAudioStatus').textContent=message;
+}
+function renderLessonAudio(){
+ const parts=LESSON_AUDIO[selectedLesson]||[];
+ $('lessonAudio').hidden=!parts.length;
+ if(narrationLesson!==selectedLesson){narrationLesson=null;narrationIndex=0;$('lessonAudioCurrent').textContent='';}
+ updateNarrationControls('English explanations · Japanese examples');
+}
+function playNarrationPart(){
+ const parts=LESSON_AUDIO[narrationLesson]||[],part=parts[narrationIndex],t=token;
+ if(!narrationPlaying||!part)return;
+ $('lessonAudioStatus').textContent=(part.lang==='ja-JP'?'Japanese example':'English explanation')+' · '+(narrationIndex+1)+' / '+parts.length;
+ $('lessonAudioCurrent').textContent=part.display;
+ speak(part.text,part.lang,()=>{
+  timer=setTimeout(()=>{
+   timer=null;if(t!==token||!narrationPlaying)return;
+   narrationIndex++;
+   if(narrationIndex>=parts.length){narrationPlaying=false;updateNarrationControls('Introduction complete · Try the practice cards when ready.');return}
+   playNarrationPart();
+  },700);
+ },t);
+}
+function listenToLesson(restart=false){
+ if(narrationPlaying&&!restart){stop();return}
+ stop();
+ const parts=LESSON_AUDIO[selectedLesson]||[];if(!parts.length)return;
+ if(restart||narrationLesson!==selectedLesson||narrationIndex>=parts.length)narrationIndex=0;
+ narrationLesson=selectedLesson;narrationPlaying=true;updateNarrationControls();playNarrationPart();
+}
+$('lessonListen').onclick=()=>listenToLesson();$('lessonRestart').onclick=()=>listenToLesson(true);
 function renderPreparation(){
  $('phraseList').replaceChildren();lessonCards().forEach(c=>{
   const row=document.createElement('div');row.className='phrase';

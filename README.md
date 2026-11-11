@@ -1,6 +1,6 @@
 # Japanese audio cards
 
-Audio-first Japanese for travellers practice, with 146 cards across fourteen lessons from the supplied course handouts.
+Audio-first Japanese for travellers practice, with 137 cards across fourteen lessons from the supplied course handouts.
 
 ## Practice on iPhone
 
@@ -26,8 +26,16 @@ Autoplay uses the existing browser voices with the selected Japanese speed. It p
 
 ## Voices and dimmed controls
 
-Settings offer an English voice chooser and preview using the voices Safari exposes. Automatic selection prefers voices identified as Premium or Enhanced, then a browser default. An explicit choice is remembered. Accessibility’s selected voice is not necessarily exposed to web pages. Compare Japanese speeds plays the same phrase at 100% and then the chosen slower rate (75% when Normal is selected).
+Settings offer an English voice chooser and preview using the voices Safari exposes. The initial choice is Australian English · system default: it requests en-AU without assigning a named voice, mirroring the Japanese default. Automatic selection requests Australian English and prefers an exposed Australian default voice, then an Australian Premium or Enhanced voice. If none is exposed, it requests the system’s en-AU default without forcing a US voice. An explicit choice is remembered. Accessibility’s selected voice is not necessarily exposed to web pages. Compare Japanese speeds plays the same phrase at 100% and then the chosen slower rate (75% when Normal is selected).
 
 During autoplay, **Dim & lock screen** covers the page and blocks its controls without stopping speech. Dimming activates only when you tap its button. Tap once to wake the shield, then separately tap **Unlock controls**. It dims the page rather than adjusting hardware brightness. A supported browser is asked to keep the screen awake during playback; this can be refused by the device. Keep Safari visible: OS lock and background playback are not supported.
 
-The first two lessons teach basic numbers (0–19 and alternative readings) and building larger numbers through 12,345. Models use explicit kana for predictable pronunciation.
+The first two lessons teach basic numbers in short sequences (including alternative readings) and building larger numbers through 12,345. Models use explicit kana for predictable pronunciation.
+
+## Narrated introductions and phrase practice
+
+The two number lessons and four counter lessons include **Listen to the lesson** introductions. Explanations use the English voice; explicitly marked examples use the Japanese voice and selected Japanese speed. Pause/Resume repeats the current section; Start again restarts the introduction. Opening settings, choosing another audio item or lesson, starting practice, or hiding the page stops narration. Narration does not change recall history.
+
+Basic counting uses six grouped sequences instead of isolated 0–10 cards, followed by nine teen cards. Matching accepts kana, digits, kanji and mixed transcriptions of each sequence. The former standalone yes/no cards are replaced by natural replies, “Yes, please” and “No, I’m all right, thank you.” New IDs avoid inheriting mastery from the former single-word cards; old stored history is retained. Short functional greetings remain complete everyday utterances. Individual keyword buttons remain preparation aids, not dictation exercises.
+
+The system-default Australian preference is applied once on this upgrade; later explicit voice choices stay remembered. The browser can expose a different voice set from iOS Accessibility, so actual downloaded-voice availability still requires iPhone testing. See [the Web Speech voice documentation](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance/voice) for language-default behaviour.
